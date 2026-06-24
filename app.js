@@ -251,11 +251,12 @@ function renderSongs() {
   const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
   const videosById = new Map(DATA.videos.map((video) => [getVideoId(video), video]));
 
-  const hits = DATA.performances.filter((performance) => {
+  const matchedPerformances = DATA.performances.filter((performance) => {
     const songId = getPerformanceSongId(performance);
     const videoId = getPerformanceVideoId(performance);
     const song = songsById.get(songId) || {};
     const video = videosById.get(videoId) || {};
+
     const text = normalize([
       getSongTitle(song),
       getSongArtist(song),
@@ -266,16 +267,68 @@ function renderSongs() {
       objectText(song),
       objectText(performance)
     ].join(' '));
+
     return text.includes(q);
   });
 
-  root.innerHTML = hits.map((performance) => {
+  const grouped = new Map();
+
+  matchedPerformances.forEach((performance) => {
     const songId = getPerformanceSongId(performance);
     const videoId = getPerformanceVideoId(performance);
-    const song = songsById.get(songId) || { title: getPerformanceSongTitle(performance) || '曲名未設定' };
-    const video = videosById.get(videoId) || { videoId, title: '配信未設定' };
+
+    const song = songsById.get(songId) || {
+      title: getPerformanceSongTitle(performance) || '曲名未設定'
+    };
+
+    const video = videosById.get(videoId) || {
+      videoId,
+      title: '配信未設定'
+    };
+
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
+
+    const key = normalize(`${songTitle} / ${artist}`);
+
+    const dateTime = new Date(getVideoDate(video)).getTime();
+    const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
+
+    const item = {
+      performance,
+      song,
+      video,
+      dateTime: safeDateTime
+    };
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        songTitle,
+        artist,
+        count: 1,
+        latest: item
+      });
+      return;
+    }
+
+    const group = grouped.get(key);
+    group.count++;
+
+    if (safeDateTime > group.latest.dateTime) {
+      group.latest = item;
+    }
+  });
+
+  const hits = Array.from(grouped.values())
+    .sort((a, b) => b.latest.dateTime - a.latest.dateTime);
+
+  root.innerHTML = hits.map((group) => {
+    const { songTitle, artist, count, latest } = group;
+
+    const performance = latest.performance;
+    const video = latest.video;
+
+    const videoId = getPerformanceVideoId(performance);
     const videoTitle = getVideoTitle(video);
     const seconds = getPerformanceSeconds(performance);
     const timestamp = getPerformanceTimestamp(performance);
@@ -285,8 +338,12 @@ function renderSongs() {
       <article class="songHit">
         <div><strong>${escapeHtml(songTitle)}</strong>${artist ? ` / ${escapeHtml(artist)}` : ''}</div>
         <div>${escapeHtml(videoTitle)}</div>
-        <div class="cardMeta">${fmtDate(getVideoDate(video))}${timestamp ? ` / ${escapeHtml(timestamp)}` : ''}</div>
-        <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">該当配信へ飛ぶ</a>
+        <div class="cardMeta">
+          ${fmtDate(getVideoDate(video))}
+          ${timestamp ? ` / ${escapeHtml(timestamp)}` : ''}
+          ${count > 1 ? ` / 歌唱回数 ${count}回` : ''}
+        </div>
+        <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">最新の該当配信へ飛ぶ</a>
       </article>
     `;
   }).join('') || '<p>該当する曲がありません。</p>';
