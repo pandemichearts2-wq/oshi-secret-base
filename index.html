@@ -1,148 +1,92 @@
-const cfg = window.OSHI_CONFIG || {};
-let DATA = { videos: [], songs: [], performances: [] };
-
-const $ = (sel) => document.querySelector(sel);
-const fmtDate = (value) => {
-  if (!value) return '日付未設定';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-};
-const monthKey = (value) => {
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '日付未設定';
-  return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月`;
-};
-const normalize = (s) => (s || '').toString().toLowerCase().normalize('NFKC');
-const youtubeUrl = (videoId, seconds) => `https://www.youtube.com/watch?v=${videoId}${seconds ? `&t=${seconds}s` : ''}`;
-
-function escapeHtml(s) {
-  return (s || '').toString().replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
-}
-
-async function loadData() {
-  const status = $('#status');
-  try {
-    if (cfg.appsScriptUrl) {
-      const res = await fetch(`${cfg.appsScriptUrl}?action=public`, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Apps Scriptから取得できませんでした');
-      DATA = await res.json();
-    } else {
-      const res = await fetch('./data/public.sample.json', { cache: 'no-store' });
-      DATA = await res.json();
-    }
-    DATA.videos = DATA.videos || [];
-    DATA.songs = DATA.songs || [];
-    DATA.performances = DATA.performances || [];
-    status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${DATA.performances.length}件`;
-    renderAll();
-  } catch (err) {
-    status.textContent = `読み込み失敗：${err.message}`;
-  }
-}
-
-function videoCard(video) {
-  const url = video.url || youtubeUrl(video.videoId);
-  return `<article class="card">
-    ${video.thumbnail ? `<img src="${escapeHtml(video.thumbnail)}" alt="">` : ''}
-    <div class="cardBody">
-      <div class="cardTitle">${escapeHtml(video.title)}</div>
-      <div class="cardMeta">${fmtDate(video.publishedAt)}${video.category ? ` / ${escapeHtml(video.category)}` : ''}</div>
-      <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">配信へ飛ぶ</a>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>物置の秘密基地</title>
+  <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__imageWrap">
+      <img class="hero__image" src="./assets/hero.png" alt="物置の秘密基地 見出しイラスト" />
     </div>
-  </article>`;
-}
+    <div class="hero__content">
+      <p class="eyebrow">非公式ファンメイドアーカイブ</p>
+      <h1>物置の秘密基地</h1>
+      <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
+      <nav class="links" aria-label="公式リンク">
+        <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
+        <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
+        <a href="https://lit.link/mimoringo" target="_blank" rel="noopener noreferrer">lit.link</a>
+      </nav>
+    </div>
+  </header>
 
-function renderTimeline() {
-  const root = $('#timelineList');
-  const groups = new Map();
-  [...DATA.videos]
-    .filter(v => !v.memberOnly)
-    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-    .forEach(v => {
-      const key = monthKey(v.publishedAt);
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(v);
-    });
-  root.innerHTML = [...groups.entries()].map(([key, videos]) => `
-    <section class="monthGroup">
-      <h3>${escapeHtml(key)}</h3>
-      ${videos.map(v => `<div class="timelineItem"><span class="cardMeta">${fmtDate(v.publishedAt)}</span><br><a href="${escapeHtml(v.url || youtubeUrl(v.videoId))}" target="_blank" rel="noopener noreferrer">${escapeHtml(v.title)}</a></div>`).join('')}
+  <main class="container">
+    <section class="notice">
+      <strong>運用方針：</strong>
+      公開中の公式リンクとタイムスタンプ索引を扱います。動画・音声・歌詞・非公開化された内容の転載はしません。
+      投稿・候補抽出された曲情報は確認済みのものだけ公開する想定です。
     </section>
-  `).join('') || '<p>まだデータがありません。</p>';
-}
 
-function renderVideos() {
-  const q = normalize($('#videoSearch').value);
-  const hits = DATA.videos.filter(v => !v.memberOnly).filter(v => {
-    const hay = normalize([v.title, v.description, v.category, (v.tags || []).join(' ')].join(' '));
-    return !q || hay.includes(q);
-  });
-  $('#videoResults').innerHTML = hits.map(videoCard).join('') || '<p>該当する配信がありません。</p>';
-}
+    <section class="toolbar" aria-label="検索と表示切り替え">
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" data-tab="timeline" type="button">軌跡</button>
+        <button class="tab" data-tab="videos" type="button">配信検索</button>
+        <button class="tab" data-tab="songs" type="button">歌枠検索</button>
+        <button class="tab" data-tab="members" type="button">メン限</button>
+      </div>
+      <div class="status" id="status">読み込み中...</div>
+    </section>
 
-function renderSongs() {
-  const q = normalize($('#songSearch').value);
-  const songsById = new Map(DATA.songs.map(s => [s.songId, s]));
-  const videosById = new Map(DATA.videos.map(v => [v.videoId, v]));
-  const hits = DATA.performances.filter(p => p.status === '確認済み').filter(p => {
-    const song = songsById.get(p.songId) || {};
-    const hay = normalize([song.title, song.artist, song.aliases, p.note].join(' '));
-    return !q || hay.includes(q);
-  });
-  $('#songResults').innerHTML = hits.map(p => {
-    const song = songsById.get(p.songId) || { title: p.songTitle || '曲名未設定' };
-    const video = videosById.get(p.videoId) || { title: '配信未設定', videoId: p.videoId };
-    const seconds = Number(p.seconds || 0);
-    return `<article class="songHit">
-      <div><strong>${escapeHtml(song.title)}</strong>${song.artist ? ` / ${escapeHtml(song.artist)}` : ''}</div>
-      <div>${escapeHtml(video.title)}</div>
-      <div class="cardMeta">${fmtDate(video.publishedAt)}${p.timestamp ? ` / ${escapeHtml(p.timestamp)}` : ''}</div>
-      <a class="openLink" href="${escapeHtml(video.url || youtubeUrl(video.videoId, seconds))}" target="_blank" rel="noopener noreferrer">該当配信へ飛ぶ</a>
-    </article>`;
-  }).join('') || '<p>該当する曲がありません。</p>';
-}
+    <section id="timeline" class="panel is-active">
+      <div class="sectionHead">
+        <h2>配信の軌跡</h2>
+        <p>年・月ごとに配信を追えます。</p>
+      </div>
+      <div id="timelineList" class="timeline"></div>
+    </section>
 
-async function loadMembers(password) {
-  const msg = $('#memberMessage');
-  const root = $('#memberResults');
-  msg.textContent = '確認中...';
-  root.innerHTML = '';
-  try {
-    if (!cfg.appsScriptUrl) {
-      msg.textContent = 'Apps Script URLを設定すると、簡易パスワード付きエリアが使えます。';
-      return;
-    }
-    const url = `${cfg.appsScriptUrl}?action=member&password=${encodeURIComponent(password)}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error('暗証番号が違うか、取得に失敗しました');
-    const data = await res.json();
-    const videos = data.videos || [];
-    msg.textContent = `メン限データ：${videos.length}件`;
-    root.innerHTML = videos.map(videoCard).join('') || '<p>データがありません。</p>';
-  } catch (err) {
-    msg.textContent = err.message;
-  }
-}
+    <section id="videos" class="panel">
+      <div class="sectionHead">
+        <h2>配信タイトル検索</h2>
+        <p>タイトル・概要・タグで検索できます。</p>
+      </div>
+      <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
+      <div id="videoResults" class="cards"></div>
+    </section>
 
-function renderAll() {
-  renderTimeline();
-  renderVideos();
-  renderSongs();
-}
+    <section id="songs" class="panel">
+      <div class="sectionHead">
+        <h2>歌枠 曲検索</h2>
+        <p>曲名・アーティスト名で、どの歌枠で歌われたか探せます。</p>
+      </div>
+      <input id="songSearch" class="search" type="search" placeholder="例：曲名、アーティスト名" />
+      <div id="songResults" class="songResults"></div>
+    </section>
 
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('is-active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
-    btn.classList.add('is-active');
-    $(`#${btn.dataset.tab}`).classList.add('is-active');
-  });
-});
-$('#videoSearch').addEventListener('input', renderVideos);
-$('#songSearch').addEventListener('input', renderSongs);
-$('#memberForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  loadMembers($('#memberPassword').value);
-});
-loadData();
+    <section id="members" class="panel">
+      <div class="sectionHead">
+        <h2>メンバーシップ限定メモ</h2>
+        <p>簡易パスワード式です。強固な認証ではないため、限定情報の扱いは最小限にしてください。</p>
+      </div>
+      <form id="memberForm" class="passwordBox">
+        <input id="memberPassword" type="password" autocomplete="current-password" placeholder="暗証番号" />
+        <button type="submit">表示</button>
+      </form>
+      <div id="memberMessage" class="memberMessage"></div>
+      <div id="memberResults" class="cards"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>物置の秘密基地 / 非公式ファンメイドツール</p>
+  </footer>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
