@@ -1,0 +1,12 @@
+// Apps Script の WebアプリURLを入れると、スプレッドシートの最新データを読み込みます。
+// 空のままだと ./data/public.sample.json を表示します。
+window.OSHI_CONFIG = {
+  siteName: '物置の秘密基地',
+  appsScriptUrl: '',
+  links: {
+    youtube: 'https://www.youtube.com/@mimori_ch',
+    x: 'https://x.com/mimori_ch?s=20',
+    marshmallow: 'https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion',
+    litlink: 'https://lit.link/mimoringo'
+  }
+};
