@@ -5,7 +5,7 @@
       "title": "サンプル：歌枠の配信タイトル",
       "publishedAt": "2026-06-01T12:00:00Z",
       "url": "https://www.youtube.com/@mimori_ch",
-      "thumbnail": "./ヒーロー.png",,
+      "thumbnail": "./ヒーロー.png",
       "category": "歌枠",
       "tags": ["歌枠", "サンプル"],
       "memberOnly": false
