@@ -1,33 +1,10 @@
-{
-  "videos": [
-    {
-      "videoId": "sample001",
-      "title": "サンプル：歌枠の配信タイトル",
-      "publishedAt": "2026-06-01T12:00:00Z",
-      "url": "https://www.youtube.com/@mimori_ch",
-      "thumbnail": "./ヒーロー.png",
-      "category": "歌枠",
-      "tags": ["歌枠", "サンプル"],
-      "memberOnly": false
-    }
-  ],
-  "songs": [
-    {
-      "songId": "song_sample_001",
-      "title": "サンプル曲",
-      "artist": "サンプルアーティスト",
-      "aliases": ""
-    }
-  ],
-  "performances": [
-    {
-      "performanceId": "perf_sample_001",
-      "videoId": "sample001",
-      "songId": "song_sample_001",
-      "timestamp": "00:12:34",
-      "seconds": 754,
-      "status": "確認済み",
-      "note": "サンプル"
-    }
-  ]
-}
+window.OSHI_CONFIG = {
+  siteName: "物置の秘密基地",
+  youtubeUrl: "https://www.youtube.com/@mimori_ch",
+  xUrl: "https://x.com/mimori_ch?s=20",
+  marshmallowUrl: "https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion",
+  litlinkUrl: "https://lit.link/mimoringo",
+
+  // ↓ この "" の中に、Apps Scriptで出たURLを貼る
+  appsScriptUrl: "ここにApps ScriptのURLを貼る"
+};
