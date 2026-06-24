@@ -73,22 +73,29 @@
       <div class="status" id="status">読み込み中...</div>
     </section>
 
-    <section id="timeline" class="panel is-active">
-      <div class="sectionHead">
-        <h2>配信の軌跡</h2>
-        <p>年・月ごとに配信を追えます。</p>
-      </div>
-      <div id="timelineList" class="timeline"></div>
-    </section>
+    <section class="searchTop">
+  <div>
+    <label for="videoSearch"><strong>配信タイトル検索</strong></label>
+    <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
+  </div>
 
-    <section id="videos" class="panel">
-      <div class="sectionHead">
-        <h2>配信タイトル検索</h2>
-        <p>タイトル・概要・タグで検索できます。「★入れたら曲検索が現れるよ」</p>
-      </div>
-      <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
-      <div id="videoResults" class="cards"></div>
-    </section>
+  <div>
+    <label for="songSearch"><strong>歌枠 曲検索</strong></label>
+    <input id="songSearch" class="search" type="search" placeholder="例：曲名、アーティスト名" />
+  </div>
+</section>
+
+<section class="searchResultsTop">
+  <div>
+    <h2>配信タイトル検索 結果</h2>
+    <div id="videoResults" class="cards"></div>
+  </div>
+
+  <div>
+    <h2>歌枠 曲検索 結果</h2>
+    <div id="songResults" class="songResults"></div>
+  </div>
+</section>
 
     <section id="songs" class="panel">
       <div class="sectionHead">
