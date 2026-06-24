@@ -6,6 +6,37 @@
 <title>🍏物置の秘密基地🍎</title>
   <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
   <link rel="stylesheet" href="./style.css" />
+  <style>
+  /* 配信検索・軌跡のサムネイルを小さくする */
+  #videoResults img,
+  #timelineList img,
+  .cards img,
+  .timeline img {
+    width: 140px !important;
+    height: 79px !important;
+    max-width: 140px !important;
+    max-height: 79px !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
+    display: block !important;
+  }
+
+  #videoResults > *,
+  #timelineList > *,
+  .cards > *,
+  .timeline > * {
+    display: grid !important;
+    grid-template-columns: 140px 1fr !important;
+    gap: 12px !important;
+    align-items: start !important;
+  }
+
+  .hero__image {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 520px !important;
+  }
+</style>
 </head>
 <body>
   <header class="hero">
