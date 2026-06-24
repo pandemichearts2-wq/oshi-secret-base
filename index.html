@@ -9,69 +9,248 @@
   <link rel="stylesheet" href="./style.css" />
 
   <style>
-    /* 見出し画像 */
-    .hero__image {
-      width: 100% !important;
-      height: auto !important;
-      max-width: 520px !important;
+    * {
+      box-sizing: border-box;
     }
 
-    /* 上部検索エリア */
-    .searchTop,
-    .searchResultsTop {
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #222;
+      background: #fffaf7;
+      line-height: 1.7;
+    }
+
+    a {
+      color: #0b6b63;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(240px, 520px) 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 28px;
+      background: linear-gradient(135deg, #fff3ef, #f0fffb);
+      border-bottom: 1px solid #f0ddd6;
+    }
+
+    .hero__image {
+      width: 100%;
+      height: auto;
+      max-width: 520px;
+      display: block;
+      border-radius: 18px;
+    }
+
+    .hero__content h1 {
+      margin: 6px 0 10px;
+      font-size: clamp(2rem, 4vw, 3.6rem);
+    }
+
+    .eyebrow {
+      font-weight: 700;
+      color: #0b6b63;
+      margin: 0;
+    }
+
+    .lead {
+      font-size: 1.05rem;
+      margin: 0 0 16px;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .links a,
+    button,
+    .openLink {
+      display: inline-block;
+      border: 1px solid #0b6b63;
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: #fff;
+      color: #0b6b63;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 28px));
+      margin: 24px auto 48px;
+    }
+
+    .notice,
+    .toolbar,
+    .searchBox,
+    .resultBox,
+    .panel {
+      background: #fff;
+      border: 1px solid #eee0db;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(80, 40, 20, 0.05);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab.is-active {
+      background: #0b6b63;
+      color: #fff;
+    }
+
+    .status {
+      font-weight: 700;
+      color: #0b6b63;
+    }
+
+    .searchGrid,
+    .resultGrid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      margin: 20px 0 28px;
+      margin-bottom: 18px;
     }
 
-    .searchTop > div,
-    .searchResultsTop > div {
-      padding: 14px;
-      border: 1px solid #eee;
-      border-radius: 14px;
-      background: #fff;
-    }
-
-    .searchTop label {
+    .searchBox label {
       display: block;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
-    .searchTop .search {
+    .search {
       width: 100%;
+      min-height: 42px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 1rem;
     }
 
-    .searchResultsTop h2 {
-      margin-top: 0;
-      font-size: 1.1rem;
+    .resultBox h2,
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
     }
 
-    /* 検索結果のサムネイルを小さくする */
-    #videoResults img,
-    #timelineList img,
-    .cards img,
-    .timeline img {
-      width: 140px !important;
-      height: 79px !important;
-      max-width: 140px !important;
-      max-height: 79px !important;
-      object-fit: cover !important;
-      border-radius: 10px !important;
-      display: block !important;
+    .panel {
+      display: none;
     }
 
-    #videoResults .card {
-      display: grid !important;
-      grid-template-columns: 140px 1fr !important;
-      gap: 12px !important;
-      align-items: start !important;
+    .panel.is-active {
+      display: block;
     }
 
-    @media (max-width: 700px) {
-      .searchTop,
-      .searchResultsTop {
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      background: #fffdfb;
+    }
+
+    .card img {
+      width: 140px;
+      height: 79px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      background: #eee;
+    }
+
+    .cardTitle {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .cardMeta {
+      color: #666;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+    }
+
+    .songResults {
+      display: grid;
+      gap: 10px;
+    }
+
+    .songHit,
+    .timelineItem {
+      padding: 12px;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      background: #fffdfb;
+    }
+
+    .monthGroup {
+      margin-bottom: 20px;
+    }
+
+    .monthGroup h3 {
+      border-left: 6px solid #0b6b63;
+      padding-left: 10px;
+    }
+
+    .passwordBox {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .passwordBox input {
+      min-height: 40px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: #555;
+    }
+
+    @media (max-width: 800px) {
+      .hero,
+      .searchGrid,
+      .resultGrid {
         grid-template-columns: 1fr;
+      }
+
+      .card {
+        grid-template-columns: 1fr;
+      }
+
+      .card img {
+        width: 100%;
+        height: auto;
+        max-height: 220px;
       }
     }
   </style>
@@ -109,38 +288,36 @@
     </section>
 
 ```
-<section class="toolbar" aria-label="検索と表示切り替え">
+<section class="toolbar" aria-label="表示切り替え">
   <div class="tabs" role="tablist">
     <button class="tab is-active" data-tab="timeline" type="button">軌跡</button>
-    <button class="tab" data-tab="videos" type="button">配信検索</button>
-    <button class="tab" data-tab="songs" type="button">歌枠検索</button>
     <button class="tab" data-tab="members" type="button">メン限</button>
   </div>
 
   <div class="status" id="status">読み込み中...</div>
 </section>
 
-<section class="searchTop">
-  <div>
-    <label for="videoSearch"><strong>配信タイトル検索</strong></label>
+<section class="searchGrid" aria-label="検索欄">
+  <div class="searchBox">
+    <label for="videoSearch">配信タイトル検索</label>
     <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
   </div>
 
-  <div>
-    <label for="songSearch"><strong>歌枠 曲検索</strong></label>
+  <div class="searchBox">
+    <label for="songSearch">歌枠 曲検索</label>
     <input id="songSearch" class="search" type="search" placeholder="例：曲名、アーティスト名" />
   </div>
 </section>
 
-<section class="searchResultsTop">
-  <div>
+<section class="resultGrid" aria-label="検索結果">
+  <div class="resultBox">
     <h2>配信タイトル検索 結果</h2>
     <div id="videoResults" class="cards">
       <p>検索ワードを入れると配信が表示されます。</p>
     </div>
   </div>
 
-  <div>
+  <div class="resultBox">
     <h2>歌枠 曲検索 結果</h2>
     <div id="songResults" class="songResults">
       <p>検索ワードを入れると曲が表示されます。</p>
@@ -154,20 +331,6 @@
     <p>年・月ごとに配信を追えます。</p>
   </div>
   <div id="timelineList" class="timeline"></div>
-</section>
-
-<section id="videos" class="panel">
-  <div class="sectionHead">
-    <h2>配信検索</h2>
-    <p>検索結果は上の「配信タイトル検索 結果」に表示されます。</p>
-  </div>
-</section>
-
-<section id="songs" class="panel">
-  <div class="sectionHead">
-    <h2>歌枠検索</h2>
-    <p>検索結果は上の「歌枠 曲検索 結果」に表示されます。</p>
-  </div>
 </section>
 
 <section id="members" class="panel">
@@ -194,7 +357,7 @@
 
   <script src="./config.js"></script>
 
-  <script src="./app.js?v=10"></script>
+  <script src="./app.js?v=11"></script>
 
 </body>
 </html>
