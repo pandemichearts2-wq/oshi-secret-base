@@ -90,17 +90,26 @@ function renderVideos() {
 
 function renderSongs() {
   const q = normalize($('#songSearch').value);
+
+  if (!q) {
+    $('#songResults').innerHTML = '<p>検索ワードを入れると曲が表示されます。</p>';
+    return;
+  }
+
   const songsById = new Map(DATA.songs.map(s => [s.songId, s]));
   const videosById = new Map(DATA.videos.map(v => [v.videoId, v]));
+
   const hits = DATA.performances.filter(p => p.status === '確認済み').filter(p => {
     const song = songsById.get(p.songId) || {};
     const hay = normalize([song.title, song.artist, song.aliases, p.note].join(' '));
-    return !q || hay.includes(q);
+    return hay.includes(q);
   });
+
   $('#songResults').innerHTML = hits.map(p => {
     const song = songsById.get(p.songId) || { title: p.songTitle || '曲名未設定' };
     const video = videosById.get(p.videoId) || { title: '配信未設定', videoId: p.videoId };
     const seconds = Number(p.seconds || 0);
+
     return `<article class="songHit">
       <div><strong>${escapeHtml(song.title)}</strong>${song.artist ? ` / ${escapeHtml(song.artist)}` : ''}</div>
       <div>${escapeHtml(video.title)}</div>
