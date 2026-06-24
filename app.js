@@ -28,7 +28,7 @@ async function loadData() {
       if (!res.ok) throw new Error('Apps Scriptから取得できませんでした');
       DATA = await res.json();
     } else {
-      const res = await fetch('./data/public.sample.json', { cache: 'no-store' });
+     const res = await fetch('./public.sample.json', { cache: 'no-store' });
       DATA = await res.json();
     }
     DATA.videos = DATA.videos || [];
