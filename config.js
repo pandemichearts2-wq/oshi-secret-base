@@ -6,5 +6,5 @@ window.OSHI_CONFIG = {
   litlinkUrl: "https://lit.link/mimoringo",
 
   // ↓ この "" の中に、Apps Scriptで出たURLを貼る
-  appsScriptUrl: "ここにApps ScriptのURLを貼る"
+  appsScriptUrl: "https://script.google.com/macros/s/長い文字列/exec"
 };
