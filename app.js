@@ -8,6 +8,25 @@ performances: []
 
 const $ = (selector) => document.querySelector(selector);
 
+function escapeHtml(value) {
+return String(value || '').replace(/[&<>"]/g, (char) => {
+return {
+'&': '&',
+'<': '<',
+'>': '>',
+'"': '"'
+}[char];
+});
+}
+
+function normalize(value) {
+return String(value || '')
+.toLowerCase()
+.normalize('NFKC')
+.replace(/\s+/g, ' ')
+.trim();
+}
+
 function fmtDate(value) {
 if (!value) return '日付未設定';
 
@@ -26,24 +45,9 @@ if (Number.isNaN(d.getTime())) return '日付未設定';
 return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月`;
 }
 
-function normalize(value) {
-return String(value || '').toLowerCase().normalize('NFKC');
-}
-
 function youtubeUrl(videoId, seconds) {
 if (!videoId) return '#';
 return `https://www.youtube.com/watch?v=${videoId}${seconds ? `&t=${seconds}s` : ''}`;
-}
-
-function escapeHtml(value) {
-return String(value || '').replace(/[&<>"]/g, (char) => {
-return {
-'&': '&',
-'<': '<',
-'>': '>',
-'"': '"'
-}[char];
-});
 }
 
 function getValue(obj, keys, fallback = '') {
@@ -56,24 +60,33 @@ return obj[key];
 return fallback;
 }
 
+function objectText(obj) {
+try {
+return normalize(JSON.stringify(obj || {}));
+} catch (error) {
+return '';
+}
+}
+
 function getVideoId(video) {
-return getValue(video, ['videoId', 'id', 'video_id']);
+return getValue(video, ['videoId', 'video_id', 'id']);
 }
 
 function getVideoTitle(video) {
-return getValue(video, ['title', 'videoTitle', 'video_title'], 'タイトル未設定');
+return getValue(video, ['title', 'videoTitle', 'video_title', 'name'], 'タイトル未設定');
 }
 
 function getVideoDate(video) {
-return getValue(video, ['publishedAt', 'published_at', 'date', 'createdAt']);
+return getValue(video, ['publishedAt', 'published_at', 'published', 'date', 'createdAt', 'created_at']);
 }
 
 function getVideoThumbnail(video) {
-return getValue(video, ['thumbnail', 'thumbnailUrl', 'thumbnail_url', 'thumb']);
+return getValue(video, ['thumbnail', 'thumbnailUrl', 'thumbnail_url', 'thumb', 'image']);
 }
 
 function getVideoUrl(video) {
-const url = getValue(video, ['url', 'videoUrl', 'video_url']);
+const url = getValue(video, ['url', 'videoUrl', 'video_url', 'link']);
+
 if (url) return url;
 
 return youtubeUrl(getVideoId(video));
@@ -81,6 +94,10 @@ return youtubeUrl(getVideoId(video));
 
 function getVideoCategory(video) {
 return getValue(video, ['category', 'type']);
+}
+
+function isMemberOnly(video) {
+return Boolean(video.memberOnly || video.member_only || video.isMemberOnly);
 }
 
 function getSongId(song) {
@@ -104,7 +121,7 @@ return getValue(performance, ['videoId', 'video_id']);
 }
 
 function getPerformanceSongTitle(performance) {
-return getValue(performance, ['songTitle', 'song_title', 'title']);
+return getValue(performance, ['songTitle', 'song_title', 'title', 'name']);
 }
 
 function getPerformanceTimestamp(performance) {
@@ -113,51 +130,9 @@ return getValue(performance, ['timestamp', 'time']);
 
 function getPerformanceSeconds(performance) {
 const value = getValue(performance, ['seconds', 'startSeconds', 'start_seconds'], 0);
-const num = Number(value);
+const number = Number(value);
 
-return Number.isFinite(num) ? num : 0;
-}
-
-function isMemberOnly(video) {
-return Boolean(video.memberOnly || video.member_only || video.isMemberOnly);
-}
-
-async function loadData() {
-const status = $('#status');
-
-try {
-let loadedData;
-
-```
-if (cfg.appsScriptUrl) {
-  const response = await fetch(`${cfg.appsScriptUrl}?action=public`, { cache: 'no-store' });
-
-  if (!response.ok) {
-    throw new Error('Apps Scriptから取得できませんでした');
-  }
-
-  loadedData = await response.json();
-} else {
-  const response = await fetch('./public.sample.json', { cache: 'no-store' });
-  loadedData = await response.json();
-}
-
-DATA.videos = loadedData.videos || [];
-DATA.songs = loadedData.songs || [];
-DATA.performances = loadedData.performances || [];
-
-if (status) {
-  status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${DATA.performances.length}件`;
-}
-
-renderAll();
-```
-
-} catch (error) {
-if (status) {
-status.textContent = `読み込み失敗：${error.message}`;
-}
-}
+return Number.isFinite(number) ? number : 0;
 }
 
 function videoCard(video) {
@@ -173,6 +148,49 @@ return `    <article class="card">
  `;
 }
 
+async function loadData() {
+const status = $('#status');
+
+try {
+let loadedData;
+
+```
+if (cfg.appsScriptUrl) {
+  const response = await fetch(`${cfg.appsScriptUrl}?action=public`, {
+    cache: 'no-store'
+  });
+
+  if (!response.ok) {
+    throw new Error('Apps Scriptから取得できませんでした');
+  }
+
+  loadedData = await response.json();
+} else {
+  const response = await fetch('./public.sample.json', {
+    cache: 'no-store'
+  });
+
+  loadedData = await response.json();
+}
+
+DATA.videos = Array.isArray(loadedData.videos) ? loadedData.videos : [];
+DATA.songs = Array.isArray(loadedData.songs) ? loadedData.songs : [];
+DATA.performances = Array.isArray(loadedData.performances) ? loadedData.performances : [];
+
+if (status) {
+  status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${DATA.performances.length}件`;
+}
+
+renderAll();
+```
+
+} catch (error) {
+if (status) {
+status.textContent = `読み込み失敗：${error.message}`;
+}
+}
+}
+
 function renderTimeline() {
 const root = $('#timelineList');
 
@@ -180,7 +198,14 @@ if (!root) return;
 
 const publicVideos = DATA.videos
 .filter((video) => !isMemberOnly(video))
-.sort((a, b) => new Date(getVideoDate(b)) - new Date(getVideoDate(a)));
+.sort((a, b) => {
+const dateA = new Date(getVideoDate(a)).getTime();
+const dateB = new Date(getVideoDate(b)).getTime();
+
+```
+  return (Number.isFinite(dateB) ? dateB : 0) - (Number.isFinite(dateA) ? dateA : 0);
+});
+```
 
 if (publicVideos.length === 0) {
 root.innerHTML = '<p>まだ配信データがありません。</p>';
@@ -225,15 +250,16 @@ return;
 const hits = DATA.videos
 .filter((video) => !isMemberOnly(video))
 .filter((video) => {
-const haystack = normalize([
+const text = normalize([
 getVideoTitle(video),
-getValue(video, ['description', 'desc']),
 getVideoCategory(video),
-getValue(video, ['tags'])
+getValue(video, ['description', 'desc']),
+getValue(video, ['tags']),
+objectText(video)
 ].join(' '));
 
 ```
-  return haystack.includes(q);
+  return text.includes(q);
 });
 ```
 
@@ -258,18 +284,24 @@ const videosById = new Map(DATA.videos.map((video) => [getVideoId(video), video]
 
 const hits = DATA.performances.filter((performance) => {
 const songId = getPerformanceSongId(performance);
-const song = songsById.get(songId) || {};
+const videoId = getPerformanceVideoId(performance);
 
 ```
-const haystack = normalize([
+const song = songsById.get(songId) || {};
+const video = videosById.get(videoId) || {};
+
+const text = normalize([
   getSongTitle(song),
   getSongArtist(song),
   getValue(song, ['aliases', 'alias']),
   getPerformanceSongTitle(performance),
-  getValue(performance, ['note', 'memo'])
+  getPerformanceTimestamp(performance),
+  getVideoTitle(video),
+  objectText(song),
+  objectText(performance)
 ].join(' '));
 
-return haystack.includes(q);
+return text.includes(q);
 ```
 
 });
