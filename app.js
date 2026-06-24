@@ -1,7 +1,11 @@
 const cfg = window.OSHI_CONFIG || {};
-let DATA = { videos: [], songs: [], performances: [] };
+let DATA = {
+videos: [],
+songs: [],
+performances: []
+};
 
-const $ = (sel) => document.querySelector(sel);
+const $ = (selector) => document.querySelector(selector);
 
 function fmtDate(value) {
 if (!value) return '日付未設定';
@@ -13,6 +17,8 @@ return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
 function monthKey(value) {
+if (!value) return '日付未設定';
+
 const d = new Date(value);
 if (Number.isNaN(d.getTime())) return '日付未設定';
 
@@ -24,17 +30,18 @@ return String(value || '').toLowerCase().normalize('NFKC');
 }
 
 function youtubeUrl(videoId, seconds) {
+if (!videoId) return '#';
 return `https://www.youtube.com/watch?v=${videoId}${seconds ? `&t=${seconds}s` : ''}`;
 }
 
 function escapeHtml(value) {
-return String(value || '').replace(/[&<>"]/g, (c) => {
+return String(value || '').replace(/[&<>"]/g, (char) => {
 return {
 '&': '&',
 '<': '<',
 '>': '>',
 '"': '"'
-}[c];
+}[char];
 });
 }
 
@@ -42,23 +49,26 @@ async function loadData() {
 const status = $('#status');
 
 try {
-if (cfg.appsScriptUrl) {
-const res = await fetch(`${cfg.appsScriptUrl}?action=public`, { cache: 'no-store' });
+let loadedData;
 
 ```
-  if (!res.ok) {
+if (cfg.appsScriptUrl) {
+  const url = `${cfg.appsScriptUrl}?action=public`;
+  const response = await fetch(url, { cache: 'no-store' });
+
+  if (!response.ok) {
     throw new Error('Apps Scriptから取得できませんでした');
   }
 
-  DATA = await res.json();
+  loadedData = await response.json();
 } else {
-  const res = await fetch('./public.sample.json', { cache: 'no-store' });
-  DATA = await res.json();
+  const response = await fetch('./public.sample.json', { cache: 'no-store' });
+  loadedData = await response.json();
 }
 
-DATA.videos = DATA.videos || [];
-DATA.songs = DATA.songs || [];
-DATA.performances = DATA.performances || [];
+DATA.videos = loadedData.videos || [];
+DATA.songs = loadedData.songs || [];
+DATA.performances = loadedData.performances || [];
 
 if (status) {
   status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${DATA.performances.length}件`;
@@ -67,18 +77,19 @@ if (status) {
 renderAll();
 ```
 
-} catch (err) {
+} catch (error) {
 if (status) {
-status.textContent = `読み込み失敗：${err.message}`;
+status.textContent = `読み込み失敗：${error.message}`;
 }
 }
 }
 
 function videoCard(video) {
-const url = video.url || youtubeUrl(video.videoId);
+const videoId = video.videoId || '';
+const url = video.url || youtubeUrl(videoId);
 
 return `    <article class="card">
-      ${video.thumbnail ?`<img src="${escapeHtml(video.thumbnail)}" alt="">`: ''}       <div class="cardBody">         <div class="cardTitle">${escapeHtml(video.title)}</div>         <div class="cardMeta">
+      ${video.thumbnail ?`<img src="${escapeHtml(video.thumbnail)}" alt="">`: ''}       <div class="cardBody">         <div class="cardTitle">${escapeHtml(video.title || 'タイトル未設定')}</div>         <div class="cardMeta">
           ${fmtDate(video.publishedAt)}${video.category ?` / ${escapeHtml(video.category)}`: ''}         </div>         <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">配信へ飛ぶ</a>       </div>     </article>
  `;
 }
@@ -87,32 +98,35 @@ function renderTimeline() {
 const root = $('#timelineList');
 if (!root) return;
 
+const publicVideos = DATA.videos
+.filter((video) => !video.memberOnly)
+.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+if (publicVideos.length === 0) {
+root.innerHTML = '<p>まだ配信データがありません。</p>';
+return;
+}
+
 const groups = new Map();
 
-[...DATA.videos]
-.filter((video) => !video.memberOnly)
-.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-.forEach((video) => {
+publicVideos.forEach((video) => {
 const key = monthKey(video.publishedAt);
 
 ```
-  if (!groups.has(key)) {
-    groups.set(key, []);
-  }
+if (!groups.has(key)) {
+  groups.set(key, []);
+}
 
-  groups.get(key).push(video);
-});
+groups.get(key).push(video);
 ```
 
-root.innerHTML = [...groups.entries()].map(([key, videos]) => {
-return `      <section class="monthGroup">         <h3>${escapeHtml(key)}</h3>
-        ${videos.map((video) => {
-          return` <div class="timelineItem"> <span class="cardMeta">${fmtDate(video.publishedAt)}</span><br> <a href="${escapeHtml(video.url || youtubeUrl(video.videoId))}" target="_blank" rel="noopener noreferrer">
-${escapeHtml(video.title)} </a> </div>
-`;
-        }).join('')}       </section>
+});
+
+root.innerHTML = Array.from(groups.entries()).map(([key, videos]) => {
+return `       <section class="monthGroup">         <h3>${escapeHtml(key)}</h3>         <div class="cards">
+          ${videos.map(videoCard).join('')}         </div>       </section>
     `;
-}).join('') || '<p>まだデータがありません。</p>';
+}).join('');
 }
 
 function renderVideos() {
@@ -131,15 +145,15 @@ return;
 const hits = DATA.videos
 .filter((video) => !video.memberOnly)
 .filter((video) => {
-const hay = normalize([
+const haystack = normalize([
 video.title,
 video.description,
 video.category,
-(video.tags || []).join(' ')
+Array.isArray(video.tags) ? video.tags.join(' ') : video.tags
 ].join(' '));
 
 ```
-  return hay.includes(q);
+  return haystack.includes(q);
 });
 ```
 
@@ -166,31 +180,39 @@ const hits = DATA.performances
 .filter((performance) => performance.status === '確認済み')
 .filter((performance) => {
 const song = songsById.get(performance.songId) || {};
-const hay = normalize([
+const haystack = normalize([
 song.title,
 song.artist,
 song.aliases,
+performance.songTitle,
 performance.note
 ].join(' '));
 
 ```
-  return hay.includes(q);
+  return haystack.includes(q);
 });
 ```
 
 root.innerHTML = hits.map((performance) => {
-const song = songsById.get(performance.songId) || { title: performance.songTitle || '曲名未設定' };
-const video = videosById.get(performance.videoId) || { title: '配信未設定', videoId: performance.videoId };
+const song = songsById.get(performance.songId) || {
+title: performance.songTitle || '曲名未設定'
+};
+
+```
+const video = videosById.get(performance.videoId) || {
+  title: '配信未設定',
+  videoId: performance.videoId
+};
+
 const seconds = Number(performance.seconds || 0);
 const url = video.url || youtubeUrl(video.videoId, seconds);
 
-```
 return `
   <article class="songHit">
     <div>
-      <strong>${escapeHtml(song.title)}</strong>${song.artist ? ` / ${escapeHtml(song.artist)}` : ''}
+      <strong>${escapeHtml(song.title || '曲名未設定')}</strong>${song.artist ? ` / ${escapeHtml(song.artist)}` : ''}
     </div>
-    <div>${escapeHtml(video.title)}</div>
+    <div>${escapeHtml(video.title || '配信未設定')}</div>
     <div class="cardMeta">
       ${fmtDate(video.publishedAt)}${performance.timestamp ? ` / ${escapeHtml(performance.timestamp)}` : ''}
     </div>
@@ -203,37 +225,37 @@ return `
 }
 
 async function loadMembers(password) {
-const msg = $('#memberMessage');
+const message = $('#memberMessage');
 const root = $('#memberResults');
 
-if (!msg || !root) return;
+if (!message || !root) return;
 
-msg.textContent = '確認中...';
+message.textContent = '確認中...';
 root.innerHTML = '';
 
 try {
 if (!cfg.appsScriptUrl) {
-msg.textContent = 'Apps Script URLを設定すると、簡易パスワード付きエリアが使えます。';
+message.textContent = 'Apps Script URLを設定すると、簡易パスワード付きエリアが使えます。';
 return;
 }
 
 ```
 const url = `${cfg.appsScriptUrl}?action=member&password=${encodeURIComponent(password)}`;
-const res = await fetch(url, { cache: 'no-store' });
+const response = await fetch(url, { cache: 'no-store' });
 
-if (!res.ok) {
+if (!response.ok) {
   throw new Error('暗証番号が違うか、取得に失敗しました');
 }
 
-const data = await res.json();
+const data = await response.json();
 const videos = data.videos || [];
 
-msg.textContent = `メン限データ：${videos.length}件`;
+message.textContent = `メン限データ：${videos.length}件`;
 root.innerHTML = videos.map(videoCard).join('') || '<p>データがありません。</p>';
 ```
 
-} catch (err) {
-msg.textContent = err.message;
+} catch (error) {
+message.textContent = error.message;
 }
 }
 
@@ -243,50 +265,66 @@ renderVideos();
 renderSongs();
 }
 
-function setupEvents() {
+function setupTabs() {
 document.querySelectorAll('.tab').forEach((button) => {
 button.addEventListener('click', () => {
-document.querySelectorAll('.tab').forEach((tab) => tab.classList.remove('is-active'));
-document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('is-active'));
+document.querySelectorAll('.tab').forEach((tab) => {
+tab.classList.remove('is-active');
+});
 
 ```
+  document.querySelectorAll('.panel').forEach((panel) => {
+    panel.classList.remove('is-active');
+  });
+
   button.classList.add('is-active');
 
-  const panel = $(`#${button.dataset.tab}`);
-
-  if (panel) {
-    panel.classList.add('is-active');
+  const targetPanel = $(`#${button.dataset.tab}`);
+  if (targetPanel) {
+    targetPanel.classList.add('is-active');
   }
 });
 ```
 
 });
+}
 
+function setupSearches() {
 const videoSearch = $('#videoSearch');
+const songSearch = $('#songSearch');
+
 if (videoSearch) {
 videoSearch.addEventListener('input', renderVideos);
 }
 
-const songSearch = $('#songSearch');
 if (songSearch) {
 songSearch.addEventListener('input', renderSongs);
 }
+}
 
+function setupMemberForm() {
 const memberForm = $('#memberForm');
-if (memberForm) {
+
+if (!memberForm) return;
+
 memberForm.addEventListener('submit', (event) => {
 event.preventDefault();
 
 ```
-  const passwordInput = $('#memberPassword');
-  const password = passwordInput ? passwordInput.value : '';
+const passwordInput = $('#memberPassword');
+const password = passwordInput ? passwordInput.value : '';
 
-  loadMembers(password);
-});
+loadMembers(password);
 ```
 
-}
+});
 }
 
-setupEvents();
+function init() {
+setupTabs();
+setupSearches();
+setupMemberForm();
 loadData();
+}
+
+init();
