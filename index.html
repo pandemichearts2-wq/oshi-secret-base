@@ -1,59 +1,104 @@
 <!doctype html>
+
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>🍏物置の秘密基地🍎</title>
+  <title>🍏物置の秘密基地🍎</title>
   <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
   <link rel="stylesheet" href="./style.css" />
+
   <style>
-  /* 配信検索・軌跡のサムネイルを小さくする */
-  #videoResults img,
-  #timelineList img,
-  .cards img,
-  .timeline img {
-    width: 140px !important;
-    height: 79px !important;
-    max-width: 140px !important;
-    max-height: 79px !important;
-    object-fit: cover !important;
-    border-radius: 10px !important;
-    display: block !important;
-  }
+    /* 見出し画像 */
+    .hero__image {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 520px !important;
+    }
 
-  #videoResults > *,
-  #timelineList > *,
-  .cards > *,
-  .timeline > * {
-    display: grid !important;
-    grid-template-columns: 140px 1fr !important;
-    gap: 12px !important;
-    align-items: start !important;
-  }
+    /* 上部検索エリア */
+    .searchTop,
+    .searchResultsTop {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 28px;
+    }
 
-  .hero__image {
-    width: 100% !important;
-    height: auto !important;
-    max-width: 520px !important;
-  }
-</style>
+    .searchTop > div,
+    .searchResultsTop > div {
+      padding: 14px;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .searchTop label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .searchTop .search {
+      width: 100%;
+    }
+
+    .searchResultsTop h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    /* 検索結果のサムネイルを小さくする */
+    #videoResults img,
+    #timelineList img,
+    .cards img,
+    .timeline img {
+      width: 140px !important;
+      height: 79px !important;
+      max-width: 140px !important;
+      max-height: 79px !important;
+      object-fit: cover !important;
+      border-radius: 10px !important;
+      display: block !important;
+    }
+
+    #videoResults .card {
+      display: grid !important;
+      grid-template-columns: 140px 1fr !important;
+      gap: 12px !important;
+      align-items: start !important;
+    }
+
+    @media (max-width: 700px) {
+      .searchTop,
+      .searchResultsTop {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
 </head>
+
 <body>
   <header class="hero">
     <div class="hero__imageWrap">
       <img class="hero__image" src="./hero.png" alt="物置の秘密基地 見出しイラスト" />
     </div>
-    <div class="hero__content">
-      <p class="eyebrow">非公式ファンメイドアーカイブ</p>
-      <h1>🍏物置の秘密基地🍎</h1>
-      <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
-      <nav class="links" aria-label="公式リンク">
-        <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
-        <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
-        <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
-        <a href="https://lit.link/mimoringo" target="_blank" rel="noopener noreferrer">lit.link</a>
-      </nav>
-    </div>
+
+```
+<div class="hero__content">
+  <p class="eyebrow">非公式ファンメイドアーカイブ</p>
+  <h1>🍏物置の秘密基地🍎</h1>
+  <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
+
+  <nav class="links" aria-label="公式リンク">
+    <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
+    <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
+    <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
+    <a href="https://lit.link/mimoringo" target="_blank" rel="noopener noreferrer">lit.link</a>
+  </nav>
+</div>
+```
+
   </header>
 
   <main class="container">
@@ -63,17 +108,19 @@
       投稿・候補抽出された曲情報は確認済みのものだけ公開する想定です。
     </section>
 
-    <section class="toolbar" aria-label="検索と表示切り替え">
-      <div class="tabs" role="tablist">
-        <button class="tab is-active" data-tab="timeline" type="button">軌跡</button>
-        <button class="tab" data-tab="videos" type="button">配信検索</button>
-        <button class="tab" data-tab="songs" type="button">歌枠検索</button>
-        <button class="tab" data-tab="members" type="button">メン限</button>
-      </div>
-      <div class="status" id="status">読み込み中...</div>
-    </section>
+```
+<section class="toolbar" aria-label="検索と表示切り替え">
+  <div class="tabs" role="tablist">
+    <button class="tab is-active" data-tab="timeline" type="button">軌跡</button>
+    <button class="tab" data-tab="videos" type="button">配信検索</button>
+    <button class="tab" data-tab="songs" type="button">歌枠検索</button>
+    <button class="tab" data-tab="members" type="button">メン限</button>
+  </div>
 
-    <section class="searchTop">
+  <div class="status" id="status">読み込み中...</div>
+</section>
+
+<section class="searchTop">
   <div>
     <label for="videoSearch"><strong>配信タイトル検索</strong></label>
     <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
@@ -88,36 +135,57 @@
 <section class="searchResultsTop">
   <div>
     <h2>配信タイトル検索 結果</h2>
-    <div id="videoResults" class="cards"></div>
+    <div id="videoResults" class="cards">
+      <p>検索ワードを入れると配信が表示されます。</p>
+    </div>
   </div>
 
   <div>
     <h2>歌枠 曲検索 結果</h2>
-    <div id="songResults" class="songResults"></div>
+    <div id="songResults" class="songResults">
+      <p>検索ワードを入れると曲が表示されます。</p>
+    </div>
   </div>
 </section>
 
-    <section id="songs" class="panel">
-      <div class="sectionHead">
-        <h2>歌枠 曲検索</h2>
-        <p>曲名・アーティスト名で、どの歌枠で歌われたか探せます。</p>
-      </div>
-      <input id="songSearch" class="search" type="search" placeholder="例：曲名、アーティスト名" />
-      <div id="songResults" class="songResults"></div>
-    </section>
+<section id="timeline" class="panel is-active">
+  <div class="sectionHead">
+    <h2>配信の軌跡</h2>
+    <p>年・月ごとに配信を追えます。</p>
+  </div>
+  <div id="timelineList" class="timeline"></div>
+</section>
 
-    <section id="members" class="panel">
-      <div class="sectionHead">
-        <h2>メンバーシップ限定メモ</h2>
-        <p>簡易パスワード式です。強固な認証ではないため、限定情報の扱いは最小限にしてください。</p>
-      </div>
-      <form id="memberForm" class="passwordBox">
-        <input id="memberPassword" type="password" autocomplete="current-password" placeholder="暗証番号" />
-        <button type="submit">表示</button>
-      </form>
-      <div id="memberMessage" class="memberMessage"></div>
-      <div id="memberResults" class="cards"></div>
-    </section>
+<section id="videos" class="panel">
+  <div class="sectionHead">
+    <h2>配信検索</h2>
+    <p>検索結果は上の「配信タイトル検索 結果」に表示されます。</p>
+  </div>
+</section>
+
+<section id="songs" class="panel">
+  <div class="sectionHead">
+    <h2>歌枠検索</h2>
+    <p>検索結果は上の「歌枠 曲検索 結果」に表示されます。</p>
+  </div>
+</section>
+
+<section id="members" class="panel">
+  <div class="sectionHead">
+    <h2>メンバーシップ限定メモ</h2>
+    <p>簡易パスワード式です。強固な認証ではないため、限定情報の扱いは最小限にしてください。</p>
+  </div>
+
+  <form id="memberForm" class="passwordBox">
+    <input id="memberPassword" type="password" autocomplete="current-password" placeholder="暗証番号" />
+    <button type="submit">表示</button>
+  </form>
+
+  <div id="memberMessage" class="memberMessage"></div>
+  <div id="memberResults" class="cards"></div>
+</section>
+```
+
   </main>
 
   <footer class="footer">
@@ -125,6 +193,8 @@
   </footer>
 
   <script src="./config.js"></script>
-  <script src="./app.js?v=8"></script>
+
+  <script src="./app.js?v=10"></script>
+
 </body>
 </html>
