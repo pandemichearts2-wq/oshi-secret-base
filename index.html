@@ -66,7 +66,6 @@
     }
 
     .links a,
-    button,
     .openLink {
       display: inline-block;
       border: 1px solid #0b6b63;
@@ -76,7 +75,6 @@
       color: #0b6b63;
       text-decoration: none;
       font-weight: 700;
-      cursor: pointer;
     }
 
     .container {
@@ -88,7 +86,7 @@
     .toolbar,
     .searchBox,
     .resultBox,
-    .panel {
+    .timelineBox {
       background: #fff;
       border: 1px solid #eee0db;
       border-radius: 18px;
@@ -103,17 +101,6 @@
       gap: 14px;
       align-items: center;
       flex-wrap: wrap;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .tab.is-active {
-      background: #0b6b63;
-      color: #fff;
     }
 
     .status {
@@ -145,17 +132,9 @@
     }
 
     .resultBox h2,
-    .panel h2 {
+    .timelineBox h2 {
       margin: 0 0 8px;
       font-size: 1.35rem;
-    }
-
-    .panel {
-      display: none;
-    }
-
-    .panel.is-active {
-      display: block;
     }
 
     .cards {
@@ -199,8 +178,7 @@
       gap: 10px;
     }
 
-    .songHit,
-    .timelineItem {
+    .songHit {
       padding: 12px;
       border: 1px solid #eee;
       border-radius: 14px;
@@ -208,26 +186,13 @@
     }
 
     .monthGroup {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .monthGroup h3 {
       border-left: 6px solid #0b6b63;
       padding-left: 10px;
-    }
-
-    .passwordBox {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 10px 0;
-    }
-
-    .passwordBox input {
-      min-height: 40px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 8px 10px;
+      margin-bottom: 12px;
     }
 
     .footer {
@@ -288,12 +253,10 @@
     </section>
 
 ```
-<section class="toolbar" aria-label="表示切り替え">
-  <div class="tabs" role="tablist">
-    <button class="tab is-active" data-tab="timeline" type="button">軌跡</button>
-    <button class="tab" data-tab="members" type="button">メン限</button>
+<section class="toolbar" aria-label="読み込み状況">
+  <div>
+    <strong>データ読み込み状況</strong>
   </div>
-
   <div class="status" id="status">読み込み中...</div>
 </section>
 
@@ -325,27 +288,12 @@
   </div>
 </section>
 
-<section id="timeline" class="panel is-active">
+<section class="timelineBox">
   <div class="sectionHead">
     <h2>配信の軌跡</h2>
     <p>年・月ごとに配信を追えます。</p>
   </div>
   <div id="timelineList" class="timeline"></div>
-</section>
-
-<section id="members" class="panel">
-  <div class="sectionHead">
-    <h2>メンバーシップ限定メモ</h2>
-    <p>簡易パスワード式です。強固な認証ではないため、限定情報の扱いは最小限にしてください。</p>
-  </div>
-
-  <form id="memberForm" class="passwordBox">
-    <input id="memberPassword" type="password" autocomplete="current-password" placeholder="暗証番号" />
-    <button type="submit">表示</button>
-  </form>
-
-  <div id="memberMessage" class="memberMessage"></div>
-  <div id="memberResults" class="cards"></div>
 </section>
 ```
 
@@ -357,7 +305,7 @@
 
   <script src="./config.js"></script>
 
-  <script src="./app.js?v=11"></script>
+  <script src="./app.js?v=12"></script>
 
 </body>
 </html>
