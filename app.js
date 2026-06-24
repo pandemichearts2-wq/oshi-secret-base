@@ -146,3 +146,34 @@ $('#memberForm').addEventListener('submit', (e) => {
   loadMembers($('#memberPassword').value);
 });
 loadData();
+// 検索するまで配信検索・歌枠検索の結果を表示しない
+window.addEventListener('load', () => {
+  const videoSearch = document.getElementById('videoSearch');
+  const videoResults = document.getElementById('videoResults');
+  const songSearch = document.getElementById('songSearch');
+  const songResults = document.getElementById('songResults');
+
+  if (videoResults) {
+    videoResults.innerHTML = '<p class="empty">検索ワードを入れると配信が表示されます。</p>';
+  }
+
+  if (songResults) {
+    songResults.innerHTML = '<p class="empty">検索ワードを入れると曲が表示されます。</p>';
+  }
+
+  if (videoSearch && videoResults) {
+    videoSearch.addEventListener('input', () => {
+      if (!videoSearch.value.trim()) {
+        videoResults.innerHTML = '<p class="empty">検索ワードを入れると配信が表示されます。</p>';
+      }
+    });
+  }
+
+  if (songSearch && songResults) {
+    songSearch.addEventListener('input', () => {
+      if (!songSearch.value.trim()) {
+        songResults.innerHTML = '<p class="empty">検索ワードを入れると曲が表示されます。</p>';
+      }
+    });
+  }
+});
