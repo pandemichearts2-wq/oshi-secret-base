@@ -10,3 +10,12 @@ window.OSHI_CONFIG = {
     litlink: 'https://lit.link/mimoringo'
   }
 };
+/* 検索結果のサムネイルを小さくする */
+.card__thumb,
+.videoThumb,
+.card img {
+  max-width: 120px;
+  max-height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+}
