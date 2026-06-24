@@ -74,10 +74,17 @@ function renderTimeline() {
 
 function renderVideos() {
   const q = normalize($('#videoSearch').value);
+
+  if (!q) {
+    $('#videoResults').innerHTML = '<p>検索ワードを入れると配信が表示されます。</p>';
+    return;
+  }
+
   const hits = DATA.videos.filter(v => !v.memberOnly).filter(v => {
     const hay = normalize([v.title, v.description, v.category, (v.tags || []).join(' ')].join(' '));
-    return !q || hay.includes(q);
+    return hay.includes(q);
   });
+
   $('#videoResults').innerHTML = hits.map(videoCard).join('') || '<p>該当する配信がありません。</p>';
 }
 
