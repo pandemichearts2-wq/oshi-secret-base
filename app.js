@@ -193,3 +193,62 @@ window.addEventListener('load', () => {
     });
   }
 });
+// 検索欄が空のときは、配信検索・歌枠検索の結果を強制的に非表示
+window.addEventListener('load', () => {
+  const videoSearch = document.getElementById('videoSearch');
+  const videoResults = document.getElementById('videoResults');
+  const songSearch = document.getElementById('songSearch');
+  const songResults = document.getElementById('songResults');
+
+  function emptyVideoMessage() {
+    if (videoSearch && videoResults && !videoSearch.value.trim()) {
+      videoResults.innerHTML = '<p>検索ワードを入れると配信が表示されます。</p>';
+    }
+  }
+
+  function emptySongMessage() {
+    if (songSearch && songResults && !songSearch.value.trim()) {
+      songResults.innerHTML = '<p>検索ワードを入れると曲が表示されます。</p>';
+    }
+  }
+
+  emptyVideoMessage();
+  emptySongMessage();
+
+  setTimeout(emptyVideoMessage, 500);
+  setTimeout(emptySongMessage, 500);
+  setTimeout(emptyVideoMessage, 1500);
+  setTimeout(emptySongMessage, 1500);
+  setTimeout(emptyVideoMessage, 3000);
+  setTimeout(emptySongMessage, 3000);
+
+  if (videoSearch) {
+    videoSearch.addEventListener('input', () => {
+      if (!videoSearch.value.trim()) emptyVideoMessage();
+    });
+  }
+
+  if (songSearch) {
+    songSearch.addEventListener('input', () => {
+      if (!songSearch.value.trim()) emptySongMessage();
+    });
+  }
+
+  if (songResults) {
+    const songObserver = new MutationObserver(() => {
+      if (songSearch && !songSearch.value.trim()) {
+        emptySongMessage();
+      }
+    });
+    songObserver.observe(songResults, { childList: true });
+  }
+
+  if (videoResults) {
+    const videoObserver = new MutationObserver(() => {
+      if (videoSearch && !videoSearch.value.trim()) {
+        emptyVideoMessage();
+      }
+    });
+    videoObserver.observe(videoResults, { childList: true });
+  }
+});
