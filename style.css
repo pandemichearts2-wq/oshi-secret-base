@@ -161,3 +161,14 @@ window.OSHI_CONFIG = {
     grid-template-columns: 1fr 1fr;
   }
 }
+.monthGroup h3 {
+  display: inline-block;
+  background: #fff5bf;
+  border: 1px solid #f0d97a;
+  border-radius: 999px;
+  padding: 6px 14px;
+  margin: 18px 0 12px;
+  color: #6b5200;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
