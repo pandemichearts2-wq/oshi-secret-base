@@ -128,6 +128,14 @@ function getPerformanceSeconds(performance) {
   return Number.isFinite(number) ? number : 0;
 }
 
+function normalizeSongGroupKey(title, artist) {
+  return normalize(`${title} / ${artist}`)
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function videoCard(video) {
   const title = getVideoTitle(video);
   const thumbnail = getVideoThumbnail(video);
@@ -334,12 +342,18 @@ function renderSongs() {
 
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
-
-    const key = normalize(`${songTitle} / ${artist}`);
+    const groupKey = normalizeSongGroupKey(songTitle, artist);
 
     const dateTime = new Date(getVideoDate(video)).getTime();
     const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
     const seconds = getPerformanceSeconds(performance);
+    const timestamp = getPerformanceTimestamp(performance);
+
+    const uniquePerformanceKey = [
+      String(videoId || '').trim(),
+      String(seconds || 0),
+      normalize(timestamp)
+    ].join('__');
 
     const item = {
       performance,
@@ -349,18 +363,22 @@ function renderSongs() {
       seconds
     };
 
-    if (!grouped.has(key)) {
-      grouped.set(key, {
+    if (!grouped.has(groupKey)) {
+      grouped.set(groupKey, {
         songTitle,
         artist,
-        count: 1,
+        count: 0,
+        seenPerformances: new Set(),
         latest: item
       });
-      return;
     }
 
-    const group = grouped.get(key);
-    group.count++;
+    const group = grouped.get(groupKey);
+
+    if (!group.seenPerformances.has(uniquePerformanceKey)) {
+      group.seenPerformances.add(uniquePerformanceKey);
+      group.count++;
+    }
 
     const latestDateTime = group.latest.dateTime;
     const latestSeconds = group.latest.seconds;
@@ -370,6 +388,8 @@ function renderSongs() {
       (safeDateTime === latestDateTime && seconds > latestSeconds)
     ) {
       group.latest = item;
+      group.songTitle = songTitle;
+      group.artist = artist;
     }
   });
 
