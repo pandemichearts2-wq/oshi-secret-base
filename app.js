@@ -168,20 +168,15 @@ function getActualPerformanceCount() {
 }
 
 function isShortVideo(video) {
+  const title = getVideoTitle(video);
+
+  if (title === '【初配信告知】神引き！？ガチャ引いてみた！【 #水森りんご / #新人Vtuber 】') {
+    return false;
+  }
+
   const durationSeconds = Number(getValue(video, ['durationSeconds', 'duration_seconds'], 0));
 
   return Number.isFinite(durationSeconds) && durationSeconds > 0 && durationSeconds <= 120;
-}
-
-function getPublicVideosSortedOldest() {
-  return DATA.videos
-    .filter((video) => !isMemberOnly(video))
-    .filter((video) => getVideoDate(video))
-    .sort((a, b) => {
-      const dateA = new Date(getVideoDate(a)).getTime();
-      const dateB = new Date(getVideoDate(b)).getTime();
-      return (Number.isFinite(dateA) ? dateA : 0) - (Number.isFinite(dateB) ? dateB : 0);
-    });
 }
 
 function getDaysFromFirstDate(firstDate) {
