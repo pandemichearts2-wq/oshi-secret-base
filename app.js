@@ -216,6 +216,11 @@ function getActivityYear(firstDate) {
   return years + 1;
 }
 
+function getFirstStreamVideo(publicVideos) {
+  const firstStreamVideoId = 'l1XC7QgWGxE';
+  return publicVideos.find((video) => getVideoId(video) === firstStreamVideoId) || null;
+}
+
 function renderStats() {
   const root = $('#statsSummary');
   if (!root) return;
@@ -231,7 +236,7 @@ function renderStats() {
   const videoCount = publicVideos.length - shortCount;
 
   const nonShortVideos = publicVideos.filter((video) => !isShortVideo(video));
-  const firstVideo = nonShortVideos[0] || publicVideos[0];
+  const firstVideo = getFirstStreamVideo(publicVideos) || nonShortVideos[0] || publicVideos[0];
   const firstDate = getVideoDate(firstVideo);
 
   const activityYear = getActivityYear(firstDate);
