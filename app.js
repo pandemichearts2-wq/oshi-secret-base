@@ -173,18 +173,6 @@ function isShortVideo(video) {
   return Number.isFinite(durationSeconds) && durationSeconds > 0 && durationSeconds <= 120;
 }
 
-  const text = normalize([
-    getVideoTitle(video),
-    getVideoCategory(video),
-    getValue(video, ['description', 'desc']),
-    arrayToText(getValue(video, ['tags'])),
-    getVideoUrl(video),
-    objectText(video)
-  ].join(' '));
-
-  return text.includes('short') || text.includes('shorts') || text.includes('#shorts') || text.includes('ショート') || getVideoUrl(video).includes('/shorts/');
-}
-
 function getPublicVideosSortedOldest() {
   return DATA.videos
     .filter((video) => !isMemberOnly(video))
