@@ -136,6 +136,37 @@ function normalizeSongGroupKey(title, artist) {
     .trim();
 }
 
+function getActualPerformanceCount() {
+  const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
+  const uniqueKeys = new Set();
+
+  DATA.performances.forEach((performance) => {
+    const songId = getPerformanceSongId(performance);
+    const videoId = getPerformanceVideoId(performance);
+    const seconds = getPerformanceSeconds(performance);
+    const timestamp = getPerformanceTimestamp(performance);
+
+    const song = songsById.get(songId) || {
+      title: getPerformanceSongTitle(performance) || '曲名未設定'
+    };
+
+    const songTitle = getSongTitle(song);
+    const artist = getSongArtist(song);
+    const songKey = normalizeSongGroupKey(songTitle, artist);
+
+    const uniqueKey = [
+      songKey,
+      String(videoId || '').trim(),
+      String(seconds || 0),
+      normalize(timestamp)
+    ].join('__');
+
+    uniqueKeys.add(uniqueKey);
+  });
+
+  return uniqueKeys.size;
+}
+
 function videoCard(video) {
   const title = getVideoTitle(video);
   const thumbnail = getVideoThumbnail(video);
@@ -175,7 +206,8 @@ async function loadData() {
     DATA.performances = Array.isArray(loadedData.performances) ? loadedData.performances : [];
 
     if (status) {
-      status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${DATA.performances.length}件`;
+      const actualPerformanceCount = getActualPerformanceCount();
+      status.textContent = `読み込み完了：配信 ${DATA.videos.length}件 / 歌唱履歴 ${actualPerformanceCount}件`;
     }
 
     renderAll();
