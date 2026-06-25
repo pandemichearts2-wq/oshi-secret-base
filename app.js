@@ -167,6 +167,116 @@ function getActualPerformanceCount() {
   return uniqueKeys.size;
 }
 
+function isShortVideo(video) {
+  const explicit = String(getValue(video, ['isShort', 'is_short'], '')).toLowerCase();
+
+  if (explicit === 'true') return true;
+  if (explicit === 'false') return false;
+
+  const durationSeconds = Number(getValue(video, ['durationSeconds', 'duration_seconds'], 0));
+
+  if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
+    return durationSeconds <= 120;
+  }
+
+  const text = normalize([
+    getVideoTitle(video),
+    getVideoCategory(video),
+    getValue(video, ['description', 'desc']),
+    arrayToText(getValue(video, ['tags'])),
+    getVideoUrl(video),
+    objectText(video)
+  ].join(' '));
+
+  return text.includes('short') || text.includes('shorts') || text.includes('#shorts') || text.includes('ショート') || getVideoUrl(video).includes('/shorts/');
+}
+
+function getPublicVideosSortedOldest() {
+  return DATA.videos
+    .filter((video) => !isMemberOnly(video))
+    .filter((video) => getVideoDate(video))
+    .sort((a, b) => {
+      const dateA = new Date(getVideoDate(a)).getTime();
+      const dateB = new Date(getVideoDate(b)).getTime();
+      return (Number.isFinite(dateA) ? dateA : 0) - (Number.isFinite(dateB) ? dateB : 0);
+    });
+}
+
+function getDaysFromFirstDate(firstDate) {
+  const start = new Date(firstDate);
+  const today = new Date();
+
+  start.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const diffMs = today.getTime() - start.getTime();
+  return Math.floor(diffMs / 86400000) + 1;
+}
+
+function getActivityYear(firstDate) {
+  const start = new Date(firstDate);
+  const today = new Date();
+
+  let years = today.getFullYear() - start.getFullYear();
+
+  const hasNotReachedAnniversary =
+    today.getMonth() < start.getMonth() ||
+    (today.getMonth() === start.getMonth() && today.getDate() < start.getDate());
+
+  if (hasNotReachedAnniversary) years--;
+
+  return years + 1;
+}
+
+function renderStats() {
+  const root = $('#statsSummary');
+  if (!root) return;
+
+  const publicVideos = getPublicVideosSortedOldest();
+
+  if (publicVideos.length === 0) {
+    root.innerHTML = '<p>まだ集計できる配信データがありません。</p>';
+    return;
+  }
+
+  const shortCount = publicVideos.filter(isShortVideo).length;
+  const videoCount = publicVideos.length - shortCount;
+
+  const nonShortVideos = publicVideos.filter((video) => !isShortVideo(video));
+  const firstVideo = nonShortVideos[0] || publicVideos[0];
+  const firstDate = getVideoDate(firstVideo);
+
+  const activityYear = getActivityYear(firstDate);
+  const daysFromFirst = getDaysFromFirstDate(firstDate);
+  const actualPerformanceCount = getActualPerformanceCount();
+
+  root.innerHTML = `
+    <div class="statCard">
+      <div class="statLabel">ショート動画投稿回数</div>
+      <div class="statNumber">${shortCount}</div>
+    </div>
+    <div class="statCard">
+      <div class="statLabel">動画・配信回数</div>
+      <div class="statNumber">${videoCount}</div>
+    </div>
+    <div class="statCard">
+      <div class="statLabel">歌唱履歴</div>
+      <div class="statNumber">${actualPerformanceCount}</div>
+    </div>
+    <div class="statCard">
+      <div class="statLabel">活動</div>
+      <div class="statNumber">${activityYear}年目</div>
+    </div>
+    <div class="statCard">
+      <div class="statLabel">初配信から</div>
+      <div class="statNumber">${daysFromFirst}日目</div>
+    </div>
+    <div class="statNote">
+      初配信日：${fmtDate(firstDate)} / ${escapeHtml(getVideoTitle(firstVideo))}
+    </div>
+  `;
+}
+
 function videoCard(video) {
   const title = getVideoTitle(video);
   const thumbnail = getVideoThumbnail(video);
@@ -459,6 +569,7 @@ function renderSongs() {
 }
 
 function renderAll() {
+  renderStats();
   renderTimeline();
   renderVideos();
   renderSongs();
