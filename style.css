@@ -114,3 +114,70 @@ window.OSHI_CONFIG = {
     grid-column: 1 / -1;
   }
 }
+/* 活動サマリー：見た目を整える */
+.statsBox {
+  background: linear-gradient(135deg, #fffdf8, #fff3ef);
+  border: 1px solid #eee0db;
+  border-radius: 22px;
+  padding: 18px;
+  margin: 0 0 20px;
+  box-shadow: 0 8px 26px rgba(80, 40, 20, 0.07);
+}
+
+.statsBox h2 {
+  margin: 0 0 14px;
+  color: #0b6b63;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #f0ddd6;
+  border-radius: 18px;
+  padding: 14px 12px;
+  box-shadow: 0 4px 14px rgba(80, 40, 20, 0.05);
+}
+
+.statLabel {
+  color: #7a6258;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.statNumber {
+  margin-top: 4px;
+  color: #0b6b63;
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.statNote {
+  grid-column: 1 / -1;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed #ead7b0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  color: #6b5a52;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
