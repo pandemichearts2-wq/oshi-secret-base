@@ -34,3 +34,28 @@ window.OSHI_CONFIG = {
   object-fit: cover;
   border-radius: 10px;
 }
+.resultFold {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  background: #fffdfb;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.resultFold summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: #0b6b63;
+}
+
+.foldContent {
+  margin-top: 12px;
+}
+
+.foldCount {
+  display: inline-block;
+  margin-left: 8px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
