@@ -168,16 +168,10 @@ function getActualPerformanceCount() {
 }
 
 function isShortVideo(video) {
-  const explicit = String(getValue(video, ['isShort', 'is_short'], '')).toLowerCase();
-
-  if (explicit === 'true') return true;
-  if (explicit === 'false') return false;
-
   const durationSeconds = Number(getValue(video, ['durationSeconds', 'duration_seconds'], 0));
 
-  if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
-    return durationSeconds <= 120;
-  }
+  return Number.isFinite(durationSeconds) && durationSeconds > 0 && durationSeconds <= 120;
+}
 
   const text = normalize([
     getVideoTitle(video),
