@@ -5,6 +5,5 @@ window.OSHI_CONFIG = {
   marshmallowUrl: "https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion",
   litlinkUrl: "https://lit.link/mimoringo",
 
-  // ↓ この "" の中に、Apps Scriptで出たURLを貼る
   appsScriptUrl: "https://script.google.com/macros/s/AKfycbyKGrZQDjYneH5Q9KIFzni1Uh9dGzbIPSwD3UJobzIgO1f8FRJht2qmjEk-HenYbvdj/exec"
 };
