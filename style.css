@@ -1,66 +1,393 @@
-// Apps Script の WebアプリURLを入れると、スプレッドシートの最新データを読み込みます。
-// 空のままだと ./data/public.sample.json を表示します。
-window.OSHI_CONFIG = {
-  siteName: '物置の秘密基地',
-  appsScriptUrl: '',
-  links: {
-    youtube: 'https://www.youtube.com/@mimori_ch',
-    x: 'https://x.com/mimori_ch?s=20',
-    marshmallow: 'https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion',
-    litlink: 'https://lit.link/mimoringo'
-  }
-};
-/* 検索結果のサムネイルを小さくする */
-.card__thumb,
-.videoThumb,
-.card img {
-  max-width: 120px;
-  max-height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
+/* 🍏物置の秘密基地🍎
+   りんご × カワウソ かわいいテーマ
+   機能は変えず、見た目だけを変更する style.css です。
+*/
+
+:root {
+  --apple-red: #ef6f7d;
+  --apple-pink: #ffe3eb;
+  --apple-green: #65bd8a;
+  --mint: #eafff4;
+  --cream: #fffaf0;
+  --honey: #fff1b8;
+  --otter: #8a6248;
+  --otter-light: #d8b99f;
+  --ink: #3d302d;
+  --sub: #78665f;
+  --line: #f0d7ce;
+  --white: rgba(255, 255, 255, 0.88);
+  --shadow: 0 14px 34px rgba(104, 72, 50, 0.12);
 }
-/* 配信検索結果のサムネイルを小さく固定 */
-.card {
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 8%, rgba(255, 196, 211, 0.72) 0 120px, transparent 121px),
+    radial-gradient(circle at 92% 10%, rgba(193, 255, 224, 0.82) 0 160px, transparent 161px),
+    radial-gradient(circle at 15% 72%, rgba(255, 241, 184, 0.55) 0 150px, transparent 151px),
+    linear-gradient(180deg, #fff7fb 0%, #fffaf0 44%, #effff7 100%);
+  font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.75;
+}
+
+body::before {
+  content: "🍎　🍏　🦦　🍎　🍏　🦦";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 10px;
+  z-index: -1;
+  opacity: 0.16;
+  font-size: 28px;
+  letter-spacing: 26px;
+  white-space: nowrap;
+  text-align: center;
+  pointer-events: none;
+}
+
+a {
+  color: #0b7563;
+}
+
+main {
+  width: min(1120px, calc(100% - 28px));
+  margin: 0 auto;
+}
+
+/* ヒーロー */
+.hero {
+  position: relative;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: minmax(240px, 520px) 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 30px;
+  border-bottom: 0;
+  border-radius: 0 0 36px 36px;
+  background:
+    linear-gradient(135deg, rgba(255, 238, 244, 0.95), rgba(231, 255, 244, 0.95)),
+    repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 12px, rgba(255,255,255,.18) 12px 24px);
+  box-shadow: var(--shadow);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  right: -72px;
+  top: -72px;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: rgba(239, 111, 125, 0.26);
+}
+
+.hero::after {
+  content: "🦦";
+  position: absolute;
+  right: 34px;
+  bottom: 22px;
+  font-size: 54px;
+  opacity: 0.20;
+  transform: rotate(-10deg);
+}
+
+.hero__image {
+  width: 100%;
+  height: auto;
+  max-width: 520px;
+  display: block;
+  border: 10px solid rgba(255,255,255,.9);
+  border-radius: 30px;
+  box-shadow: 0 18px 36px rgba(104, 72, 50, 0.18);
+  transform: rotate(-1deg);
+}
+
+.eyebrow {
+  display: inline-block;
+  margin: 0;
+  color: #0b7563;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(101, 189, 138, .45);
+  border-radius: 999px;
+  padding: 5px 13px;
+  font-weight: 900;
+}
+
+.hero__content h1 {
+  margin: 8px 0 10px;
+  color: #493431;
+  font-size: clamp(2rem, 4vw, 3.7rem);
+  letter-spacing: .04em;
+  text-shadow: 2px 2px 0 rgba(255,255,255,.9);
+}
+
+.hero__content h1::after {
+  content: " 🍎🦦";
+  font-size: .58em;
+  vertical-align: middle;
+}
+
+.lead {
+  color: #6f5b55;
+  font-size: 1.06rem;
+  font-weight: 800;
+}
+
+/* ボタン */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.links a,
+.openLink,
+.filterClearButton {
+  display: inline-block;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 15px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  box-shadow: 0 8px 18px rgba(112, 84, 70, 0.16);
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.links a:hover,
+.openLink:hover,
+.filterClearButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 12px 24px rgba(112, 84, 70, 0.20);
+}
+
+/* 共通ボックス */
+.notice,
+.statsBox,
+.searchBox,
+.resultBox,
+.timelineBox {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+.notice {
+  margin: 22px 0;
+  padding: 15px 18px;
+  border-left: 9px solid var(--apple-green);
+}
+
+.notice strong {
+  color: #0b7563;
+}
+
+.sectionHead h2,
+.resultBox h2,
+.statsBox h2 {
+  margin-top: 0;
+  color: #0b7563;
+  letter-spacing: .03em;
+}
+
+.sectionHead h2::before,
+.resultBox h2::before,
+.statsBox h2::before {
+  content: "🍎 ";
+}
+
+/* 活動サマリー */
+.statsBox {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  margin-bottom: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 190, 202, .32), transparent 180px),
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(255, 246, 232, .94));
+}
+
+.statsBox::after {
+  content: "🦦";
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  font-size: 34px;
+  opacity: .18;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
   gap: 14px;
-  align-items: start;
+}
+
+.statCard {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff, #fff8fb);
+  border: 1px solid #f2d7df;
+  border-radius: 20px;
+  padding: 15px 13px;
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.08);
+}
+
+.statCard::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  top: -22px;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: rgba(101, 189, 138, .20);
+}
+
+.statLabel {
+  position: relative;
+  z-index: 1;
+  color: #80645f;
+  font-size: .88rem;
+  font-weight: 900;
+}
+
+.statNumber {
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+  color: var(--apple-red);
+  font-size: clamp(1.6rem, 3.2vw, 2.25rem);
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.statNote {
+  grid-column: 1 / -1;
+  background: rgba(255, 250, 240, .92);
+  border: 1px dashed #e9c77f;
+  border-radius: 16px;
+  padding: 11px 13px;
+  color: #735b50;
+  font-weight: 700;
+}
+
+/* 検索 */
+.searchGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.searchBox {
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,.93), rgba(231,255,244,.84));
+}
+
+.searchBox label {
+  display: block;
+  margin-bottom: 8px;
+  color: #0b7563;
+  font-weight: 950;
+}
+
+.search {
+  width: 100%;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 12px 16px;
+  font: inherit;
+  box-shadow: inset 0 2px 8px rgba(90, 50, 35, .04);
+}
+
+.search:focus,
+.timelineFilters input:focus {
+  outline: none;
+  border-color: #ff93a3;
+  box-shadow: 0 0 0 4px rgba(255, 147, 163, .18);
+}
+
+/* 結果 */
+.resultGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.resultBox,
+.timelineBox {
+  padding: 18px;
+}
+
+.cards {
+  display: grid;
+  gap: 14px;
+}
+
+.card,
+.songHit {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255,255,255,.93);
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.08);
+  overflow: hidden;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card:hover,
+.songHit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 13px 28px rgba(96, 55, 35, 0.13);
 }
 
 .card img {
-  width: 120px !important;
-  height: 68px !important;
-  max-width: 120px !important;
-  object-fit: cover;
-  border-radius: 10px;
+  width: 100%;
+  display: block;
+  border-radius: 18px 18px 8px 8px;
 }
 
-
-/* 配信の軌跡：月見出しハイライト */
-.timelineList .monthGroup h3,
-.monthGroup h3 {
-  display: inline-block !important;
-  background: #fff5bf !important;
-  border: 1px solid #f0d97a !important;
-  border-radius: 999px !important;
-  padding: 6px 14px !important;
-  margin: 18px 0 12px !important;
-  color: #6b5200 !important;
-  font-size: 1.05rem !important;
-  font-weight: 900 !important;
+.cardBody,
+.songHit {
+  padding: 13px;
 }
 
-/* 配信の軌跡：年・月・日フィルター */
+.cardTitle {
+  color: #493431;
+  font-weight: 950;
+}
+
+.cardMeta {
+  color: #8a7067;
+  font-size: .93rem;
+  font-weight: 700;
+}
+
+/* 配信の軌跡 */
+.timelineBox {
+  margin: 22px 0;
+}
+
 .timelineFilters {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
   gap: 10px;
-  background: #fffdf4;
+  background: linear-gradient(135deg, #fffdf4, #effff7);
   border: 1px solid #f0d97a;
-  border-radius: 16px;
-  padding: 12px;
-  margin: 0 0 16px;
+  border-radius: 20px;
+  padding: 14px;
+  margin: 0 0 18px;
 }
 
 .timelineFilters label {
@@ -68,37 +395,108 @@ window.OSHI_CONFIG = {
   gap: 4px;
   color: #6b5200;
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .timelineFilters input {
   width: 110px;
   border: 1px solid #ead7b0;
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 9px 12px;
   font: inherit;
   background: #fff;
-}
-
-.filterClearButton {
-  border: 1px solid #0b6b63;
-  border-radius: 999px;
-  padding: 8px 14px;
-  background: #fff;
-  color: #0b6b63;
-  font-weight: 800;
-  cursor: pointer;
 }
 
 .filterHint,
 .filterResult {
   width: 100%;
   margin: 2px 0 0;
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--sub);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.monthGroup h3 {
+  display: inline-block;
+  background: linear-gradient(135deg, #fff5bf, #e9fff3);
+  border: 1px solid #f0d97a;
+  border-radius: 999px;
+  padding: 7px 16px;
+  margin: 18px 0 12px;
+  color: #6b5200;
+  font-size: 1.05rem;
+  font-weight: 950;
+  box-shadow: 0 6px 14px rgba(120, 90, 30, .10);
+}
+
+.monthGroup h3::before {
+  content: "🍏 ";
+}
+
+/* 折りたたみ */
+.resultFold {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.07);
+  padding: 12px;
+}
+
+.resultFold summary {
+  color: #0b7563;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.foldContent {
+  margin-top: 12px;
+}
+
+.foldCount {
+  display: inline-block;
+  margin-left: 8px;
+  background: var(--honey);
+  border-radius: 999px;
+  padding: 3px 9px;
+  color: #6b5200;
+  font-size: .9rem;
+  font-weight: 900;
+}
+
+/* フッター */
+.footer {
+  padding: 22px;
+  color: #8a7067;
+  text-align: center;
+  font-weight: 800;
+}
+
+/* スマホ */
+@media (max-width: 900px) {
+  .hero,
+  .searchGrid,
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
+  main {
+    width: min(100% - 18px, 1120px);
+  }
+
+  .hero {
+    padding: 22px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
   .timelineFilters {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -112,72 +510,5 @@ window.OSHI_CONFIG = {
   .filterHint,
   .filterResult {
     grid-column: 1 / -1;
-  }
-}
-/* 活動サマリー：見た目を整える */
-.statsBox {
-  background: linear-gradient(135deg, #fffdf8, #fff3ef);
-  border: 1px solid #eee0db;
-  border-radius: 22px;
-  padding: 18px;
-  margin: 0 0 20px;
-  box-shadow: 0 8px 26px rgba(80, 40, 20, 0.07);
-}
-
-.statsBox h2 {
-  margin: 0 0 14px;
-  color: #0b6b63;
-  font-size: 1.45rem;
-  font-weight: 900;
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.statCard {
-  background: #fff;
-  border: 1px solid #f0ddd6;
-  border-radius: 18px;
-  padding: 14px 12px;
-  box-shadow: 0 4px 14px rgba(80, 40, 20, 0.05);
-}
-
-.statLabel {
-  color: #7a6258;
-  font-size: 0.88rem;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.statNumber {
-  margin-top: 4px;
-  color: #0b6b63;
-  font-size: clamp(1.55rem, 3vw, 2.15rem);
-  font-weight: 950;
-  line-height: 1.2;
-}
-
-.statNote {
-  grid-column: 1 / -1;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px dashed #ead7b0;
-  border-radius: 14px;
-  padding: 10px 12px;
-  color: #6b5a52;
-  font-size: 0.92rem;
-}
-
-@media (max-width: 900px) {
-  .statsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 520px) {
-  .statsGrid {
-    grid-template-columns: 1fr;
   }
 }
