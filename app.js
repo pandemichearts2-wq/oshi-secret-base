@@ -329,12 +329,55 @@ async function loadData() {
   }
 }
 
+function getTimelineFilterValues() {
+  const year = Number(getValue($('#timelineYear'), ['value'], 0));
+  const month = Number(getValue($('#timelineMonth'), ['value'], 0));
+  const day = Number(getValue($('#timelineDay'), ['value'], 0));
+
+  return {
+    year: Number.isFinite(year) ? year : 0,
+    month: Number.isFinite(month) ? month : 0,
+    day: Number.isFinite(day) ? day : 0
+  };
+}
+
+function matchesTimelineFilter(video, filter) {
+  const value = getVideoDate(video);
+  if (!value) return false;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  if (filter.year && year !== filter.year) return false;
+  if (filter.month && month !== filter.month) return false;
+  if (filter.day && day !== filter.day) return false;
+
+  return true;
+}
+
+function getTimelineFilterLabel(filter) {
+  const parts = [];
+
+  if (filter.year) parts.push(`${filter.year}年`);
+  if (filter.month) parts.push(`${filter.month}月`);
+  if (filter.day) parts.push(`${filter.day}日`);
+
+  return parts.join('') || 'すべて';
+}
+
 function renderTimeline() {
   const root = $('#timelineList');
   if (!root) return;
 
+  const filter = getTimelineFilterValues();
+
   const publicVideos = DATA.videos
     .filter((video) => !isMemberOnly(video))
+    .filter((video) => matchesTimelineFilter(video, filter))
     .sort((a, b) => {
       const dateA = new Date(getVideoDate(a)).getTime();
       const dateB = new Date(getVideoDate(b)).getTime();
@@ -342,7 +385,7 @@ function renderTimeline() {
     });
 
   if (publicVideos.length === 0) {
-    root.innerHTML = '<p>まだ配信データがありません。</p>';
+    root.innerHTML = `<p>${escapeHtml(getTimelineFilterLabel(filter))} に該当する配信がありません。</p>`;
     return;
   }
 
@@ -353,14 +396,17 @@ function renderTimeline() {
     groups.get(key).push(video);
   });
 
-  root.innerHTML = Array.from(groups.entries()).map(([key, videos]) => {
-    return `
-      <section class="monthGroup">
-        <h3>${escapeHtml(key)}</h3>
-        <div class="cards">${videos.map(videoCard).join('')}</div>
-      </section>
-    `;
-  }).join('');
+  root.innerHTML = `
+    <p class="filterResult">表示中：${escapeHtml(getTimelineFilterLabel(filter))} / ${publicVideos.length}件</p>
+    ${Array.from(groups.entries()).map(([key, videos]) => {
+      return `
+        <section class="monthGroup">
+          <h3>${escapeHtml(key)}</h3>
+          <div class="cards">${videos.map(videoCard).join('')}</div>
+        </section>
+      `;
+    }).join('')}
+  `;
 }
 
 function renderVideos() {
@@ -592,6 +638,26 @@ function setupSearches() {
     songSearch.addEventListener('input', renderSongs);
     songSearch.addEventListener('change', renderSongs);
     songSearch.addEventListener('keyup', renderSongs);
+  }
+
+  ['#timelineYear', '#timelineMonth', '#timelineDay'].forEach((selector) => {
+    const input = $(selector);
+    if (!input) return;
+
+    input.addEventListener('input', renderTimeline);
+    input.addEventListener('change', renderTimeline);
+    input.addEventListener('keyup', renderTimeline);
+  });
+
+  const timelineClear = $('#timelineClear');
+  if (timelineClear) {
+    timelineClear.addEventListener('click', () => {
+      ['#timelineYear', '#timelineMonth', '#timelineDay'].forEach((selector) => {
+        const input = $(selector);
+        if (input) input.value = '';
+      });
+      renderTimeline();
+    });
   }
 }
 
