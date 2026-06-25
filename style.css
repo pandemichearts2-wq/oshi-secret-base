@@ -34,141 +34,83 @@ window.OSHI_CONFIG = {
   object-fit: cover;
   border-radius: 10px;
 }
-.resultFold {
-  border: 1px solid #eee;
-  border-radius: 14px;
-  background: #fffdfb;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-}
 
-.resultFold summary {
-  cursor: pointer;
-  font-weight: 800;
-  color: #0b6b63;
-}
 
-.foldContent {
-  margin-top: 12px;
-}
-
-.foldCount {
-  display: inline-block;
-  margin-left: 8px;
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-/* 検索結果のサムネイルを小さくする */
-.card__thumb,
-.videoThumb,
-.card img {
-  max-width: 120px;
-  max-height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-/* 配信検索結果のサムネイルを小さく固定 */
-.card {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 14px;
-  align-items: start;
-}
-
-.card img {
-  width: 120px !important;
-  height: 68px !important;
-  max-width: 120px !important;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-/* 重複した配信タイトルの折りたたみ表示 */
-.resultFold {
-  border: 1px solid #eee;
-  border-radius: 14px;
-  background: #fffdfb;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-}
-
-.resultFold summary {
-  cursor: pointer;
-  font-weight: 800;
-  color: #0b6b63;
-}
-
-.foldContent {
-  margin-top: 12px;
-}
-
-.foldCount {
-  display: inline-block;
-  margin-left: 8px;
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-.statsBox {
-  background: #fff;
-  border: 1px solid #eee0db;
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 18px rgba(80, 40, 20, 0.05);
-}
-
-.statsBox h2 {
-  margin: 0 0 12px;
-  font-size: 1.35rem;
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(110px, 1fr));
-  gap: 12px;
-}
-
-.statCard {
-  border: 1px solid #eee;
-  border-radius: 14px;
-  background: #fffdfb;
-  padding: 12px;
-}
-
-.statLabel {
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.statNumber {
-  font-size: 1.7rem;
-  font-weight: 900;
-  color: #0b6b63;
-}
-
-.statNote {
-  grid-column: 1 / -1;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 800px) {
-  .statsGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
+/* 配信の軌跡：月見出しハイライト */
+.timelineList .monthGroup h3,
 .monthGroup h3 {
-  display: inline-block;
-  background: #fff5bf;
+  display: inline-block !important;
+  background: #fff5bf !important;
+  border: 1px solid #f0d97a !important;
+  border-radius: 999px !important;
+  padding: 6px 14px !important;
+  margin: 18px 0 12px !important;
+  color: #6b5200 !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+}
+
+/* 配信の軌跡：年・月・日フィルター */
+.timelineFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  background: #fffdf4;
   border: 1px solid #f0d97a;
-  border-radius: 999px;
-  padding: 6px 14px;
-  margin: 18px 0 12px;
+  border-radius: 16px;
+  padding: 12px;
+  margin: 0 0 16px;
+}
+
+.timelineFilters label {
+  display: grid;
+  gap: 4px;
   color: #6b5200;
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.timelineFilters input {
+  width: 110px;
+  border: 1px solid #ead7b0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font: inherit;
+  background: #fff;
+}
+
+.filterClearButton {
+  border: 1px solid #0b6b63;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: #fff;
+  color: #0b6b63;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.filterHint,
+.filterResult {
+  width: 100%;
+  margin: 2px 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .timelineFilters {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .timelineFilters input {
+    width: 100%;
+  }
+
+  .filterClearButton,
+  .filterHint,
+  .filterResult {
+    grid-column: 1 / -1;
+  }
 }
