@@ -231,10 +231,55 @@ function renderVideos() {
         arrayToText(getValue(video, ['tags'])),
         objectText(video)
       ].join(' '));
+
       return text.includes(q);
+    })
+    .sort((a, b) => {
+      const dateA = new Date(getVideoDate(a)).getTime();
+      const dateB = new Date(getVideoDate(b)).getTime();
+      return (Number.isFinite(dateB) ? dateB : 0) - (Number.isFinite(dateA) ? dateA : 0);
     });
 
-  root.innerHTML = hits.map(videoCard).join('') || '<p>該当する配信がありません。</p>';
+  if (hits.length === 0) {
+    root.innerHTML = '<p>該当する配信がありません。</p>';
+    return;
+  }
+
+  const grouped = new Map();
+
+  hits.forEach((video) => {
+    const title = getVideoTitle(video);
+    const key = normalize(title);
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        title,
+        videos: []
+      });
+    }
+
+    grouped.get(key).videos.push(video);
+  });
+
+  root.innerHTML = Array.from(grouped.values()).map((group) => {
+    const videos = group.videos;
+
+    if (videos.length === 1) {
+      return videoCard(videos[0]);
+    }
+
+    return `
+      <details class="resultFold duplicateVideos">
+        <summary>
+          ${escapeHtml(group.title)}
+          <span class="foldCount">重複 ${videos.length}件</span>
+        </summary>
+        <div class="cards foldContent">
+          ${videos.map(videoCard).join('')}
+        </div>
+      </details>
+    `;
+  }).join('');
 }
 
 function renderSongs() {
@@ -254,6 +299,7 @@ function renderSongs() {
   const matchedPerformances = DATA.performances.filter((performance) => {
     const songId = getPerformanceSongId(performance);
     const videoId = getPerformanceVideoId(performance);
+
     const song = songsById.get(songId) || {};
     const video = videosById.get(videoId) || {};
 
@@ -293,12 +339,14 @@ function renderSongs() {
 
     const dateTime = new Date(getVideoDate(video)).getTime();
     const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
+    const seconds = getPerformanceSeconds(performance);
 
     const item = {
       performance,
       song,
       video,
-      dateTime: safeDateTime
+      dateTime: safeDateTime,
+      seconds
     };
 
     if (!grouped.has(key)) {
@@ -314,7 +362,13 @@ function renderSongs() {
     const group = grouped.get(key);
     group.count++;
 
-    if (safeDateTime > group.latest.dateTime) {
+    const latestDateTime = group.latest.dateTime;
+    const latestSeconds = group.latest.seconds;
+
+    if (
+      safeDateTime > latestDateTime ||
+      (safeDateTime === latestDateTime && seconds > latestSeconds)
+    ) {
       group.latest = item;
     }
   });
@@ -336,7 +390,10 @@ function renderSongs() {
 
     return `
       <article class="songHit">
-        <div><strong>${escapeHtml(songTitle)}</strong>${artist ? ` / ${escapeHtml(artist)}` : ''}</div>
+        <div>
+          <strong>${escapeHtml(songTitle)}</strong>
+          ${artist ? ` / ${escapeHtml(artist)}` : ''}
+        </div>
         <div>${escapeHtml(videoTitle)}</div>
         <div class="cardMeta">
           ${fmtDate(getVideoDate(video))}
