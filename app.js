@@ -218,7 +218,17 @@ function getActivityYear(firstDate) {
 
 function getFirstStreamVideo(publicVideos) {
   const firstStreamVideoId = 'l1XC7QgWGxE';
-  return publicVideos.find((video) => getVideoId(video) === firstStreamVideoId) || null;
+  const found = publicVideos.find((video) => getVideoId(video) === firstStreamVideoId);
+
+  if (found) return found;
+
+  return {
+    videoId: firstStreamVideoId,
+    title: '初配信',
+    publishedAt: '2024-10-24T00:00:00+09:00',
+    url: 'https://www.youtube.com/watch?v=l1XC7QgWGxE',
+    memberOnly: false
+  };
 }
 
 function renderStats() {
