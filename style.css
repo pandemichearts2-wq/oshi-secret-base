@@ -127,11 +127,7 @@ main {
   text-shadow: 2px 2px 0 rgba(255,255,255,.9);
 }
 
-.hero__content h1::after {
-  content: " 🍎🦦";
-  font-size: .58em;
-  vertical-align: middle;
-}
+
 
 .lead {
   color: #6f5b55;
