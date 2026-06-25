@@ -59,3 +59,55 @@ window.OSHI_CONFIG = {
   font-size: 0.9rem;
   font-weight: 700;
 }
+/* 検索結果のサムネイルを小さくする */
+.card__thumb,
+.videoThumb,
+.card img {
+  max-width: 120px;
+  max-height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* 配信検索結果のサムネイルを小さく固定 */
+.card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.card img {
+  width: 120px !important;
+  height: 68px !important;
+  max-width: 120px !important;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* 重複した配信タイトルの折りたたみ表示 */
+.resultFold {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  background: #fffdfb;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.resultFold summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: #0b6b63;
+}
+
+.foldContent {
+  margin-top: 12px;
+}
+
+.foldCount {
+  display: inline-block;
+  margin-left: 8px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
