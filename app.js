@@ -273,20 +273,17 @@ function getOriginalSongFeaturedVideo() {
 }
 
 function getAquariumFeaturedVideo() {
-  const keyword = normalize('アクアリウムは踊らない');
+  const aquariumVideoId = 'PhwJjKUSHuA';
 
-  return DATA.videos
-    .filter((video) => !isMemberOnly(video))
-    .filter((video) => normalize(getVideoTitle(video)).includes(keyword))
-    .sort((a, b) => {
-      const viewsA = getVideoViewCount(a);
-      const viewsB = getVideoViewCount(b);
-      if (viewsB !== viewsA) return viewsB - viewsA;
-
-      const dateA = new Date(getVideoDate(a)).getTime();
-      const dateB = new Date(getVideoDate(b)).getTime();
-      return (Number.isFinite(dateB) ? dateB : 0) - (Number.isFinite(dateA) ? dateA : 0);
-    })[0] || null;
+  return DATA.videos.find((video) => getVideoId(video) === aquariumVideoId) || {
+    videoId: aquariumVideoId,
+    title: 'アクアリウムは踊らない',
+    publishedAt: '',
+    url: 'https://www.youtube.com/watch?v=PhwJjKUSHuA',
+    thumbnail: '',
+    category: '配信',
+    memberOnly: false
+  };
 }
 
 function getMostViewedVideo() {
@@ -343,7 +340,7 @@ function renderFeaturedVideos() {
 
   const cards = [
     featuredCard('オリジナルソング', originalSong, 'まず聴いてほしい代表曲です。'),
-    featuredCard('アクアリウムは踊らない', aquarium, aquarium ? 'タイトルに「アクアリウムは踊らない」を含む配信です。' : '対象の配信が見つかったらここに表示されます。'),
+    featuredCard('アクアリウムは踊らない', aquarium, '指定されたおすすめ配信です。'),
     featuredCard('いちばん見られている配信', mostViewed, getVideoViewCount(mostViewed) ? '視聴回数が一番多い公開動画・配信です。' : '視聴回数データ取得後に自動で更新されます。')
   ].filter(Boolean);
 
