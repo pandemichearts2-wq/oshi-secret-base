@@ -6,6 +6,8 @@ let DATA = {
   performances: []
 };
 
+let ACTIVE_TIMELINE_CATEGORY = '';
+
 const $ = (selector) => document.querySelector(selector);
 
 function escapeHtml(value) {
@@ -84,6 +86,18 @@ function getVideoUrl(video) {
   const url = getValue(video, ['url', 'videoUrl', 'video_url', 'link']);
   if (url) return url;
   return youtubeUrl(getVideoId(video));
+}
+
+function getVideoViewCount(video) {
+  const value = getValue(video, ['viewCount', 'view_count', 'views'], 0);
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function fmtNumber(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '0';
+  return number.toLocaleString('ja-JP');
 }
 
 function getVideoCategory(video) {
@@ -231,6 +245,97 @@ function getFirstStreamVideo(publicVideos) {
   };
 }
 
+function getOriginalSongFeaturedVideo() {
+  const originalSongVideoId = 'rY5kf-ML4V4';
+  return DATA.videos.find((video) => getVideoId(video) === originalSongVideoId) || {
+    videoId: originalSongVideoId,
+    title: 'オリジナルソング',
+    publishedAt: '',
+    url: 'https://www.youtube.com/watch?v=rY5kf-ML4V4',
+    thumbnail: '',
+    category: 'オリジナルソング',
+    memberOnly: false
+  };
+}
+
+function getAquariumFeaturedVideo() {
+  const keyword = normalize('アクアリウムは踊らない');
+
+  return DATA.videos
+    .filter((video) => !isMemberOnly(video))
+    .filter((video) => normalize(getVideoTitle(video)).includes(keyword))
+    .sort((a, b) => {
+      const viewsA = getVideoViewCount(a);
+      const viewsB = getVideoViewCount(b);
+      if (viewsB !== viewsA) return viewsB - viewsA;
+
+      const dateA = new Date(getVideoDate(a)).getTime();
+      const dateB = new Date(getVideoDate(b)).getTime();
+      return (Number.isFinite(dateB) ? dateB : 0) - (Number.isFinite(dateA) ? dateA : 0);
+    })[0] || null;
+}
+
+function getMostViewedVideo() {
+  const publicVideos = DATA.videos
+    .filter((video) => !isMemberOnly(video))
+    .filter((video) => getVideoId(video))
+    .filter((video) => getVideoId(video) !== 'rY5kf-ML4V4');
+
+  if (publicVideos.length === 0) return null;
+
+  const videosWithViews = publicVideos.filter((video) => getVideoViewCount(video) > 0);
+  const targets = videosWithViews.length ? videosWithViews : publicVideos;
+
+  return targets
+    .slice()
+    .sort((a, b) => getVideoViewCount(b) - getVideoViewCount(a))[0] || null;
+}
+
+function featuredCard(label, video, note) {
+  if (!video) return '';
+
+  const title = getVideoTitle(video);
+  const thumbnail = getVideoThumbnail(video);
+  const url = getVideoUrl(video);
+  const date = getVideoDate(video);
+  const category = getVideoCategory(video);
+  const viewCount = getVideoViewCount(video);
+
+  return `
+    <article class="featuredCard">
+      <div class="featuredBadge">${escapeHtml(label)}</div>
+      ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="">` : '<div class="featuredNoImage">🍎</div>'}
+      <div class="featuredBody">
+        <div class="featuredTitle">${escapeHtml(title)}</div>
+        <div class="cardMeta">
+          ${date ? fmtDate(date) : '日付未設定'}
+          ${category ? ` / ${escapeHtml(category)}` : ''}
+          ${viewCount ? ` / ${fmtNumber(viewCount)}回再生` : ''}
+        </div>
+        ${note ? `<p class="featuredNote">${escapeHtml(note)}</p>` : ''}
+        <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">見に行く</a>
+      </div>
+    </article>
+  `;
+}
+
+function renderFeaturedVideos() {
+  const root = $('#featuredVideos');
+  if (!root) return;
+
+  const originalSong = getOriginalSongFeaturedVideo();
+  const aquarium = getAquariumFeaturedVideo();
+  const mostViewed = getMostViewedVideo();
+
+  const cards = [
+    featuredCard('オリジナルソング', originalSong, 'まず聴いてほしい代表曲です。'),
+    featuredCard('アクアリウムは踊らない', aquarium, aquarium ? 'タイトルに「アクアリウムは踊らない」を含む配信です。' : '対象の配信が見つかったらここに表示されます。'),
+    featuredCard('いちばん見られている配信', mostViewed, getVideoViewCount(mostViewed) ? '視聴回数が一番多い公開動画・配信です。' : '視聴回数データ取得後に自動で更新されます。')
+  ].filter(Boolean);
+
+  root.innerHTML = cards.join('') || '<p>おすすめ動画を表示できませんでした。</p>';
+}
+
 function renderStats() {
   const root = $('#statsSummary');
   if (!root) return;
@@ -329,6 +434,76 @@ async function loadData() {
   }
 }
 
+function getNormalizedCategory(video) {
+  const title = normalize(getVideoTitle(video));
+  const category = normalize(getVideoCategory(video));
+  const text = `${title} ${category}`;
+
+  if (text.includes('pr') || text.includes('案件') || text.includes('winticket')) return 'PR';
+  if (text.includes('歌枠') || text.includes('karaoke') || text.includes('sing')) return '歌枠';
+  if (text.includes('朝活') || text.includes('おはよう') || text.includes('縦型朝活')) return '朝活';
+  if (text.includes('ゲーム') || text.includes('deltarune') || text.includes('耐久')) return 'ゲーム';
+  if (text.includes('記念') || text.includes('周年') || text.includes('誕生日') || text.includes('登録者')) return '記念';
+  if (text.includes('雑談') || text.includes('マシュマロ') || text.includes('挨拶') || text.includes('あいさつ')) return '雑談';
+
+  return getVideoCategory(video) || '配信';
+}
+
+function getCategoryCounts() {
+  const counts = new Map();
+
+  DATA.videos
+    .filter((video) => !isMemberOnly(video))
+    .forEach((video) => {
+      const category = getNormalizedCategory(video);
+      counts.set(category, (counts.get(category) || 0) + 1);
+    });
+
+  const preferred = ['歌枠', '雑談', '朝活', 'ゲーム', '記念', 'PR', '配信'];
+
+  return Array.from(counts.entries())
+    .sort((a, b) => {
+      const ai = preferred.indexOf(a[0]);
+      const bi = preferred.indexOf(b[0]);
+
+      if (ai !== -1 || bi !== -1) {
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      }
+
+      return b[1] - a[1] || a[0].localeCompare(b[0], 'ja');
+    });
+}
+
+function renderCategoryButtons() {
+  const root = $('#categoryButtons');
+  if (!root) return;
+
+  const counts = getCategoryCounts();
+
+  if (counts.length === 0) {
+    root.innerHTML = '<p>カテゴリを表示できる配信がありません。</p>';
+    return;
+  }
+
+  root.innerHTML = [
+    `<button type="button" class="categoryButton ${ACTIVE_TIMELINE_CATEGORY ? '' : 'isActive'}" data-category="">すべて</button>`,
+    ...counts.map(([category, count]) => {
+      const active = category === ACTIVE_TIMELINE_CATEGORY ? ' isActive' : '';
+      return `<button type="button" class="categoryButton${active}" data-category="${escapeHtml(category)}">${escapeHtml(category)} <span>${count}</span></button>`;
+    })
+  ].join('');
+
+  root.querySelectorAll('.categoryButton').forEach((button) => {
+    button.addEventListener('click', () => {
+      ACTIVE_TIMELINE_CATEGORY = button.dataset.category || '';
+      renderCategoryButtons();
+      ACTIVE_TIMELINE_CATEGORY = '';
+      renderCategoryButtons();
+      renderTimeline();
+    });
+  });
+}
+
 function getTimelineFilterValues() {
   const year = Number(getValue($('#timelineYear'), ['value'], 0));
   const month = Number(getValue($('#timelineMonth'), ['value'], 0));
@@ -378,6 +553,7 @@ function renderTimeline() {
   const publicVideos = DATA.videos
     .filter((video) => !isMemberOnly(video))
     .filter((video) => matchesTimelineFilter(video, filter))
+    .filter((video) => !ACTIVE_TIMELINE_CATEGORY || getNormalizedCategory(video) === ACTIVE_TIMELINE_CATEGORY)
     .sort((a, b) => {
       const dateA = new Date(getVideoDate(a)).getTime();
       const dateB = new Date(getVideoDate(b)).getTime();
@@ -385,7 +561,8 @@ function renderTimeline() {
     });
 
   if (publicVideos.length === 0) {
-    root.innerHTML = `<p>${escapeHtml(getTimelineFilterLabel(filter))} に該当する配信がありません。</p>`;
+    const filterLabel = `${getTimelineFilterLabel(filter)}${ACTIVE_TIMELINE_CATEGORY ? ` / ${ACTIVE_TIMELINE_CATEGORY}` : ''}`;
+    root.innerHTML = `<p>${escapeHtml(filterLabel)} に該当する配信がありません。</p>`;
     return;
   }
 
@@ -397,7 +574,7 @@ function renderTimeline() {
   });
 
   root.innerHTML = `
-    <p class="filterResult">表示中：${escapeHtml(getTimelineFilterLabel(filter))} / ${publicVideos.length}件</p>
+    <p class="filterResult">表示中：${escapeHtml(`${getTimelineFilterLabel(filter)}${ACTIVE_TIMELINE_CATEGORY ? ` / ${ACTIVE_TIMELINE_CATEGORY}` : ''}`)} / ${publicVideos.length}件</p>
     ${Array.from(groups.entries()).map(([key, videos]) => {
       return `
         <section class="monthGroup">
@@ -477,6 +654,74 @@ function renderVideos() {
           ${videos.map(videoCard).join('')}
         </div>
       </details>
+    `;
+  }).join('');
+}
+
+function getSongRanking(limit = 5) {
+  const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
+  const grouped = new Map();
+
+  DATA.performances.forEach((performance) => {
+    const songId = getPerformanceSongId(performance);
+    const videoId = getPerformanceVideoId(performance);
+    const seconds = getPerformanceSeconds(performance);
+    const timestamp = getPerformanceTimestamp(performance);
+
+    const song = songsById.get(songId) || {
+      title: getPerformanceSongTitle(performance) || '曲名未設定'
+    };
+
+    const songTitle = getSongTitle(song);
+    const artist = getSongArtist(song);
+    const groupKey = normalizeSongGroupKey(songTitle, artist);
+    const uniquePerformanceKey = [
+      String(videoId || '').trim(),
+      String(seconds || 0),
+      normalize(timestamp)
+    ].join('__');
+
+    if (!grouped.has(groupKey)) {
+      grouped.set(groupKey, {
+        songTitle,
+        artist,
+        count: 0,
+        seen: new Set()
+      });
+    }
+
+    const group = grouped.get(groupKey);
+    if (!group.seen.has(uniquePerformanceKey)) {
+      group.seen.add(uniquePerformanceKey);
+      group.count++;
+    }
+  });
+
+  return Array.from(grouped.values())
+    .sort((a, b) => b.count - a.count || a.songTitle.localeCompare(b.songTitle, 'ja'))
+    .slice(0, limit);
+}
+
+function renderSongRanking() {
+  const root = $('#songRanking');
+  if (!root) return;
+
+  const ranking = getSongRanking(5);
+
+  if (ranking.length === 0) {
+    root.innerHTML = '<p>まだランキングを作れる歌唱履歴がありません。</p>';
+    return;
+  }
+
+  root.innerHTML = ranking.map((item, index) => {
+    return `
+      <article class="rankingItem">
+        <div class="rankingRank">${index + 1}</div>
+        <div class="rankingBody">
+          <div class="rankingTitle">${escapeHtml(item.songTitle)}${item.artist ? ` / ${escapeHtml(item.artist)}` : ''}</div>
+          <div class="cardMeta">歌唱回数 ${item.count}回</div>
+        </div>
+      </article>
     `;
   }).join('');
 }
@@ -618,6 +863,10 @@ function renderSongs() {
 }
 
 function renderAll() {
+  renderProfileLink();
+  renderFeaturedVideos();
+  renderSongRanking();
+  renderCategoryButtons();
   renderStats();
   renderTimeline();
   renderVideos();
