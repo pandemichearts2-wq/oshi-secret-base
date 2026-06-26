@@ -669,6 +669,7 @@ function renderVideos() {
 
 function getSongRanking(limit = 5) {
   const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
+  const videosById = new Map(DATA.videos.map((video) => [getVideoId(video), video]));
   const grouped = new Map();
 
   DATA.performances.forEach((performance) => {
@@ -681,6 +682,11 @@ function getSongRanking(limit = 5) {
       title: getPerformanceSongTitle(performance) || '曲名未設定'
     };
 
+    const video = videosById.get(videoId) || {
+      videoId,
+      title: '配信未設定'
+    };
+
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
     const groupKey = normalizeSongGroupKey(songTitle, artist);
@@ -690,19 +696,39 @@ function getSongRanking(limit = 5) {
       normalize(timestamp)
     ].join('__');
 
+    const dateTime = new Date(getVideoDate(video)).getTime();
+    const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
+
+    const item = {
+      performance,
+      song,
+      video,
+      dateTime: safeDateTime,
+      seconds
+    };
+
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, {
         songTitle,
         artist,
         count: 0,
-        seen: new Set()
+        seen: new Set(),
+        latest: item
       });
     }
 
     const group = grouped.get(groupKey);
+
     if (!group.seen.has(uniquePerformanceKey)) {
       group.seen.add(uniquePerformanceKey);
       group.count++;
+    }
+
+    if (
+      item.dateTime > group.latest.dateTime ||
+      (item.dateTime === group.latest.dateTime && item.seconds > group.latest.seconds)
+    ) {
+      group.latest = item;
     }
   });
 
@@ -723,6 +749,13 @@ function renderSongRanking() {
   }
 
   root.innerHTML = ranking.map((item, index) => {
+    const latest = item.latest || {};
+    const performance = latest.performance || {};
+    const video = latest.video || {};
+    const videoId = getPerformanceVideoId(performance);
+    const seconds = getPerformanceSeconds(performance);
+    const url = videoId ? youtubeUrl(videoId, seconds) : getVideoUrl(video);
+
     return `
       <article class="rankingItem">
         <div class="rankingRank">${index + 1}</div>
@@ -730,6 +763,7 @@ function renderSongRanking() {
           <div class="rankingTitle">${escapeHtml(item.songTitle)}${item.artist ? ` / ${escapeHtml(item.artist)}` : ''}</div>
           <div class="cardMeta">歌唱回数 ${item.count}回</div>
         </div>
+        <a class="rankingListenButton" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">聞いてみる</a>
       </article>
     `;
   }).join('');
