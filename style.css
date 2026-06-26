@@ -754,3 +754,21 @@ main {
     margin-top: 12px;
   }
 }
+
+/* 運用方針 */
+.policyBox {
+  width: min(1120px, calc(100% - 28px));
+  margin: 24px auto 0;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.07);
+  color: var(--sub);
+  font-size: .92rem;
+  font-weight: 800;
+}
+
+.policyBox p {
+  margin: 0;
+}
