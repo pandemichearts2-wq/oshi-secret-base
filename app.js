@@ -450,14 +450,27 @@ function getNormalizedCategory(video) {
   const category = normalize(getVideoCategory(video));
   const text = `${title} ${category}`;
 
+  if (text.includes('正拳突き')) return '正拳突き';
+  if (text.includes('朗読') || text.includes('読み聞かせ')) return '朗読';
+  if (text.includes('歌ってみた') || text.includes('歌みた') || text.includes('cover')) return '歌ってみた';
+  if (text.includes('コラボ') || text.includes('対談') || text.includes('ゲスト') || text.includes('凸待ち')) return 'コラボ';
   if (text.includes('pr') || text.includes('案件') || text.includes('winticket')) return 'PR';
   if (text.includes('歌枠') || text.includes('karaoke') || text.includes('sing')) return '歌枠';
   if (text.includes('朝活') || text.includes('おはよう') || text.includes('縦型朝活')) return '朝活';
-  if (text.includes('ゲーム') || text.includes('deltarune') || text.includes('耐久')) return 'ゲーム';
+  if (
+    text.includes('実況') ||
+    text.includes('ゲーム') ||
+    text.includes('deltarune') ||
+    text.includes('アクアリウムは踊らない') ||
+    text.includes('初見プレイ') ||
+    text.includes('プレイ')
+  ) {
+    return '実況';
+  }
   if (text.includes('記念') || text.includes('周年') || text.includes('誕生日') || text.includes('登録者')) return '記念';
   if (text.includes('雑談') || text.includes('マシュマロ') || text.includes('挨拶') || text.includes('あいさつ')) return '雑談';
 
-  return getVideoCategory(video) || '配信';
+  return '';
 }
 
 function getCategoryCounts() {
@@ -467,10 +480,11 @@ function getCategoryCounts() {
     .filter((video) => !isMemberOnly(video))
     .forEach((video) => {
       const category = getNormalizedCategory(video);
+      if (!category) return;
       counts.set(category, (counts.get(category) || 0) + 1);
     });
 
-  const preferred = ['歌枠', '雑談', '朝活', 'ゲーム', '記念', 'PR', '配信'];
+  const preferred = ['歌枠', '雑談', '朝活', 'コラボ', '歌ってみた', '実況', '朗読', '正拳突き', '記念', 'PR'];
 
   return Array.from(counts.entries())
     .sort((a, b) => {
