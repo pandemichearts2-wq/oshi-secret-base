@@ -245,6 +245,20 @@ function getFirstStreamVideo(publicVideos) {
   };
 }
 
+function renderProfileLink() {
+  const link = $('#litlinkHighlight');
+  if (!link) return;
+
+  const url = cfg.litlinkUrl || cfg.litLinkUrl || '';
+
+  if (url) {
+    link.href = url;
+  } else {
+    link.removeAttribute('href');
+    link.textContent = 'リットリンクURL未設定';
+  }
+}
+
 function getOriginalSongFeaturedVideo() {
   const originalSongVideoId = 'rY5kf-ML4V4';
   return DATA.videos.find((video) => getVideoId(video) === originalSongVideoId) || {
@@ -496,8 +510,6 @@ function renderCategoryButtons() {
   root.querySelectorAll('.categoryButton').forEach((button) => {
     button.addEventListener('click', () => {
       ACTIVE_TIMELINE_CATEGORY = button.dataset.category || '';
-      renderCategoryButtons();
-      ACTIVE_TIMELINE_CATEGORY = '';
       renderCategoryButtons();
       renderTimeline();
     });
@@ -905,6 +917,8 @@ function setupSearches() {
         const input = $(selector);
         if (input) input.value = '';
       });
+      ACTIVE_TIMELINE_CATEGORY = '';
+      renderCategoryButtons();
       renderTimeline();
     });
   }
