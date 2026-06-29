@@ -150,6 +150,32 @@ function normalizeSongGroupKey(title, artist) {
     .trim();
 }
 
+function cleanSongTitleForRanking(title) {
+  let text = String(title || '')
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .trim();
+
+  // 既に title 側へ「曲名 / 歌手」ごと入ってしまった古いデータを、ランキングだけ曲名に戻す
+  text = text.split(/[／/]/)[0].trim();
+
+  // 「ver」「cover」などが曲名側に混ざった場合の表記ゆれを軽く吸収
+  text = text
+    .replace(/\s*(?:谷山浩子|手嶌葵|deeen|deen)?\s*ver\.?$/i, '')
+    .replace(/\s*(?:cover|covered by).+$/i, '')
+    .trim();
+
+  return text || String(title || '').trim();
+}
+
+function normalizeSongRankingKey(title) {
+  return normalize(cleanSongTitleForRanking(title))
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function isIgnoredSongTitle(title) {
   const key = normalize(String(title || ''))
     .replace(/[♪♫🎵🎶]/g, '')
@@ -169,6 +195,8 @@ function isIgnoredSongTitle(title) {
     '待機',
     '待機画面',
     '待機所',
+    '待機開け',
+    '待機明け',
     'ed',
     'ending',
     'エンディング',
@@ -744,10 +772,11 @@ function getSongRanking(limit = 5) {
       title: '配信未設定'
     };
 
-    const songTitle = getSongTitle(song);
+    const originalSongTitle = getSongTitle(song);
+    const songTitle = cleanSongTitleForRanking(originalSongTitle);
     const artist = getSongArtist(song);
     if (isIgnoredSongTitle(songTitle)) return;
-    const groupKey = normalizeSongGroupKey(songTitle, artist);
+    const groupKey = normalizeSongRankingKey(songTitle);
     const uniquePerformanceKey = [
       String(videoId || '').trim(),
       String(seconds || 0),
@@ -768,7 +797,7 @@ function getSongRanking(limit = 5) {
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, {
         songTitle,
-        artist,
+        artist: '',
         count: 0,
         seen: new Set(),
         latest: item
@@ -879,10 +908,11 @@ function renderSongs() {
       title: '配信未設定'
     };
 
-    const songTitle = getSongTitle(song);
+    const originalSongTitle = getSongTitle(song);
+    const songTitle = cleanSongTitleForRanking(originalSongTitle);
     const artist = getSongArtist(song);
     if (isIgnoredSongTitle(songTitle)) return;
-    const groupKey = normalizeSongGroupKey(songTitle, artist);
+    const groupKey = normalizeSongRankingKey(songTitle);
 
     const dateTime = new Date(getVideoDate(video)).getTime();
     const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
@@ -906,7 +936,7 @@ function renderSongs() {
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, {
         songTitle,
-        artist,
+        artist: '',
         count: 0,
         seenPerformances: new Set(),
         latest: item
