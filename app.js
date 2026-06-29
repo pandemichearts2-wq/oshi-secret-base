@@ -150,6 +150,48 @@ function normalizeSongGroupKey(title, artist) {
     .trim();
 }
 
+function isIgnoredSongTitle(title) {
+  const key = normalize(String(title || ''))
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .replace(/^[\s\-:：・▶]+/, '')
+    .replace(/[\s\-:：・▶]+$/, '')
+    .trim();
+
+  const ignored = new Set([
+    '開始',
+    'start',
+    '配信開始',
+    '本編開始',
+    'op',
+    'opening',
+    'オープニング',
+    '待機',
+    '待機画面',
+    '待機所',
+    'ed',
+    'ending',
+    'エンディング',
+    '終了',
+    'end',
+    '配信終了',
+    '休憩',
+    'break',
+    '雑談',
+    'mc',
+    '告知',
+    '準備',
+    '準備中',
+    '音量調整',
+    'マイク調整',
+    'トイレ',
+    '水分補給'
+  ]);
+
+  return ignored.has(key);
+}
+
+
 function getActualPerformanceCount() {
   const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
   const uniqueKeys = new Set();
@@ -166,6 +208,7 @@ function getActualPerformanceCount() {
 
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
+    if (isIgnoredSongTitle(songTitle)) return;
     const songKey = normalizeSongGroupKey(songTitle, artist);
 
     const uniqueKey = [
@@ -703,6 +746,7 @@ function getSongRanking(limit = 5) {
 
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
+    if (isIgnoredSongTitle(songTitle)) return;
     const groupKey = normalizeSongGroupKey(songTitle, artist);
     const uniquePerformanceKey = [
       String(videoId || '').trim(),
@@ -804,6 +848,8 @@ function renderSongs() {
     const song = songsById.get(songId) || {};
     const video = videosById.get(videoId) || {};
 
+    if (isIgnoredSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance))) return false;
+
     const text = normalize([
       getSongTitle(song),
       getSongArtist(song),
@@ -835,6 +881,7 @@ function renderSongs() {
 
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
+    if (isIgnoredSongTitle(songTitle)) return;
     const groupKey = normalizeSongGroupKey(songTitle, artist);
 
     const dateTime = new Date(getVideoDate(video)).getTime();
