@@ -747,7 +747,7 @@ function getSongRanking(limit = 5) {
   });
 
   return Array.from(grouped.values())
-    .sort((a, b) => b.count - a.count || a.songTitle.localeCompare(b.songTitle, 'ja'))
+    .sort((a, b) => b.count - a.count || String(a.songTitle || '').localeCompare(String(b.songTitle || ''), 'ja'))
     .slice(0, limit);
 }
 
@@ -774,7 +774,7 @@ function renderSongRanking() {
       <article class="rankingItem">
         <div class="rankingRank">${index + 1}</div>
         <div class="rankingBody">
-          <div class="rankingTitle">${escapeHtml(item.songTitle)}${item.artist ? ` / ${escapeHtml(item.artist)}` : ''}</div>
+          <div class="rankingTitle">${escapeHtml(String(item.songTitle || '曲名未設定'))}${item.artist ? ` / ${escapeHtml(String(item.artist))}` : ''}</div>
           <div class="cardMeta">歌唱回数 ${item.count}回</div>
         </div>
         <a class="rankingListenButton" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">聞いてみる</a>
@@ -919,15 +919,23 @@ function renderSongs() {
   }).join('') || '<p>該当する曲がありません。</p>';
 }
 
+function safeRender_(name, fn) {
+  try {
+    fn();
+  } catch (error) {
+    console.error(`${name} failed`, error);
+  }
+}
+
 function renderAll() {
-  renderProfileLink();
-  renderFeaturedVideos();
-  renderSongRanking();
-  renderCategoryButtons();
-  renderStats();
-  renderTimeline();
-  renderVideos();
-  renderSongs();
+  safeRender_('renderProfileLink', renderProfileLink);
+  safeRender_('renderFeaturedVideos', renderFeaturedVideos);
+  safeRender_('renderSongRanking', renderSongRanking);
+  safeRender_('renderCategoryButtons', renderCategoryButtons);
+  safeRender_('renderStats', renderStats);
+  safeRender_('renderTimeline', renderTimeline);
+  safeRender_('renderVideos', renderVideos);
+  safeRender_('renderSongs', renderSongs);
 }
 
 function setupSearches() {
