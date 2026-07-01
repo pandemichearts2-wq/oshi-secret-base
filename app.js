@@ -1220,6 +1220,60 @@ function resetSearchInput(input) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+
+function setupHorrorEasterEgg() {
+  const heroImage = $('.hero__image');
+  const escapeBox = $('#horrorEscape');
+  const escapeInput = $('#horrorEscapeInput');
+
+  if (!heroImage || !escapeBox || !escapeInput) return;
+
+  let clickCount = 0;
+  let timer = null;
+
+  function enterHorrorMode() {
+    document.body.classList.add('horrorMode');
+    escapeBox.hidden = false;
+    escapeInput.value = '';
+    setTimeout(() => escapeInput.focus(), 80);
+  }
+
+  function leaveHorrorMode() {
+    document.body.classList.remove('horrorMode');
+    escapeBox.hidden = true;
+    escapeInput.value = '';
+    clickCount = 0;
+  }
+
+  heroImage.addEventListener('click', () => {
+    if (document.body.classList.contains('horrorMode')) return;
+
+    clickCount += 1;
+
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      clickCount = 0;
+    }, 5000);
+
+    if (clickCount >= 10) {
+      clearTimeout(timer);
+      enterHorrorMode();
+    }
+  });
+
+  escapeInput.addEventListener('input', () => {
+    if (escapeInput.value.trim() === 'ごめんなさい') {
+      leaveHorrorMode();
+    }
+  });
+
+  escapeInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && escapeInput.value.trim() === 'ごめんなさい') {
+      leaveHorrorMode();
+    }
+  });
+}
+
 function setupSearches() {
   const videoSearch = $('#videoSearch');
   const videoSearchClear = $('#videoSearchClear');
@@ -1320,6 +1374,7 @@ function setupSearches() {
 
 function init() {
   setupSearches();
+  setupHorrorEasterEgg();
   loadData();
 }
 
