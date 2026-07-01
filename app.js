@@ -121,12 +121,12 @@ function getSongArtist(song) {
 }
 
 function getSongArtistForSearch(song) {
-  const artist = getSongArtist(song);
+  const artist = cleanArtistForSearch(getSongArtist(song));
   if (artist) return artist;
 
   const title = getSongTitle(song);
   const slashParts = String(title || '').split(/[／/]/).map(s => s.trim()).filter(Boolean);
-  if (slashParts.length >= 2) return slashParts[1];
+  if (slashParts.length >= 2) return cleanArtistForSearch(slashParts[1]);
 
   return '';
 }
@@ -170,6 +170,12 @@ function cleanSongTitleForRanking(title) {
   // 既に title 側へ「曲名 / 歌手」ごと入ってしまった古いデータを、ランキングだけ曲名に戻す
   text = text.split(/[／/]/)[0].trim();
 
+  // 先頭に混ざった区切り記号を除去
+  text = text
+    .replace(/^[\s:：・／/｜|\-－—–]+/, '')
+    .replace(/[\s:：・／/｜|\-－—–]+$/, '')
+    .trim();
+
   // 「ver」「cover」などが曲名側に混ざった場合の表記ゆれを軽く吸収
   text = text
     .replace(/\s*(?:谷山浩子|手嶌葵|deeen|deen)?\s*ver\.?$/i, '')
@@ -177,6 +183,39 @@ function cleanSongTitleForRanking(title) {
     .trim();
 
   return text || String(title || '').trim();
+}
+
+function cleanArtistForSearch(artist) {
+  return String(artist || '')
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .replace(/^[\s:：・／/｜|\-－—–]+/, '')
+    .replace(/[\s:：・／/｜|\-－—–]+$/, '')
+    .trim();
+}
+
+function getDisplayTimestamp(value) {
+  if (!value) return '';
+
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const total = value.getHours() * 3600 + value.getMinutes() * 60 + value.getSeconds();
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  const text = String(value || '').trim();
+
+  const dateMatch = text.match(/1899-12-29T(\d{2}):(\d{2}):(\d{2})/);
+  if (dateMatch) {
+    const h = Number(dateMatch[1]);
+    const m = Number(dateMatch[2]);
+    const s = Number(dateMatch[3]);
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  return text;
 }
 
 function normalizeSongRankingKey(title) {
@@ -893,39 +932,9 @@ function renderSongs() {
   const songsById = new Map(DATA.songs.map((song) => [getSongId(song), song]));
   const videosById = new Map(DATA.videos.map((video) => [getVideoId(video), video]));
 
-  const matchedPerformances = DATA.performances.filter((performance) => {
-    const songId = getPerformanceSongId(performance);
-    const videoId = getPerformanceVideoId(performance);
-
-    const song = songsById.get(songId) || {};
-    const video = videosById.get(videoId) || {};
-
-    const originalSongTitle = getSongTitle(song) || getPerformanceSongTitle(performance);
-    const cleanSongTitle = cleanSongTitleForRanking(originalSongTitle);
-    const artist = getSongArtistForSearch(song);
-
-    if (isUnsetSongTitle(cleanSongTitle) || isIgnoredSongTitle(cleanSongTitle)) return false;
-
-    const titleText = normalize([
-      cleanSongTitle,
-      originalSongTitle,
-      getPerformanceSongTitle(performance)
-    ].join(' '));
-
-    const artistText = normalize([
-      artist,
-      getSongArtist(song)
-    ].join(' '));
-
-    const matchesTitle = !titleQuery || titleText.includes(titleQuery);
-    const matchesArtist = !artistQuery || artistText.includes(artistQuery);
-
-    return matchesTitle && matchesArtist;
-  });
-
   const grouped = new Map();
 
-  matchedPerformances.forEach((performance) => {
+  DATA.performances.forEach((performance) => {
     const songId = getPerformanceSongId(performance);
     const videoId = getPerformanceVideoId(performance);
 
@@ -938,16 +947,28 @@ function renderSongs() {
       title: '配信未設定'
     };
 
-    const originalSongTitle = getSongTitle(song);
+    const originalSongTitle = getSongTitle(song) || getPerformanceSongTitle(performance);
     const songTitle = cleanSongTitleForRanking(originalSongTitle);
     const artist = getSongArtistForSearch(song);
+
     if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
-    const groupKey = normalizeSongRankingKey(songTitle);
+
+    const titleText = normalize(songTitle);
+    const artistText = normalize(artist);
+
+    const matchesTitle = !titleQuery || titleText.includes(titleQuery);
+    const matchesArtist = !artistQuery || artistText.includes(artistQuery);
+    if (!matchesTitle || !matchesArtist) return;
+
+    const groupKey = [
+      normalizeSongRankingKey(songTitle),
+      normalize(artist)
+    ].join('__');
 
     const dateTime = new Date(getVideoDate(video)).getTime();
     const safeDateTime = Number.isFinite(dateTime) ? dateTime : 0;
     const seconds = getPerformanceSeconds(performance);
-    const timestamp = getPerformanceTimestamp(performance);
+    const timestamp = getDisplayTimestamp(getPerformanceTimestamp(performance));
 
     const uniquePerformanceKey = [
       String(videoId || '').trim(),
@@ -960,13 +981,14 @@ function renderSongs() {
       song,
       video,
       dateTime: safeDateTime,
-      seconds
+      seconds,
+      timestamp
     };
 
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, {
         songTitle,
-        artist: '',
+        artist,
         count: 0,
         seenPerformances: new Set(),
         latest: item
@@ -994,7 +1016,7 @@ function renderSongs() {
   });
 
   const hits = Array.from(grouped.values())
-    .sort((a, b) => b.latest.dateTime - a.latest.dateTime);
+    .sort((a, b) => b.latest.dateTime - a.latest.dateTime || String(a.songTitle || '').localeCompare(String(b.songTitle || ''), 'ja'));
 
   root.innerHTML = hits.map((group) => {
     const { songTitle, artist, count, latest } = group;
@@ -1005,7 +1027,7 @@ function renderSongs() {
     const videoId = getPerformanceVideoId(performance);
     const videoTitle = getVideoTitle(video);
     const seconds = getPerformanceSeconds(performance);
-    const timestamp = getPerformanceTimestamp(performance);
+    const timestamp = latest.timestamp || getDisplayTimestamp(getPerformanceTimestamp(performance));
     const url = videoId ? youtubeUrl(videoId, seconds) : getVideoUrl(video);
 
     return `
