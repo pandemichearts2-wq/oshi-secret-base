@@ -1337,3 +1337,181 @@ main {
   box-shadow: 0 8px 16px rgba(112, 84, 70, 0.11);
 }
 
+/* 見出し画像10回クリックの隠しホラー演出 */
+.hero__image {
+  cursor: pointer;
+}
+
+.horrorEscape {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 9999;
+  width: min(360px, calc(100% - 32px));
+  transform: translateX(-50%);
+  border: 1px solid rgba(120, 0, 18, .7);
+  border-radius: 18px;
+  background: rgba(12, 0, 4, .88);
+  box-shadow: 0 0 24px rgba(180, 0, 28, .38);
+  padding: 14px;
+  color: #f8dce2;
+  text-align: center;
+}
+
+.horrorEscape label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ffb7c3;
+  font-weight: 950;
+  letter-spacing: .08em;
+}
+
+.horrorEscape input {
+  width: 100%;
+  border: 1px solid rgba(255, 120, 140, .6);
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  color: #2b0008;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 900;
+  text-align: center;
+}
+
+.horrorMode {
+  color: #eadde0;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(150, 0, 24, .28), transparent 210px),
+    radial-gradient(circle at 10% 80%, rgba(80, 0, 20, .45), transparent 240px),
+    linear-gradient(180deg, #090006 0%, #170008 45%, #020001 100%) !important;
+}
+
+.horrorMode::before {
+  content: "ごめんなさい　ごめんなさい　ごめんなさい";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 12px;
+  z-index: 9998;
+  opacity: .18;
+  color: #ffb7c3;
+  font-size: 20px;
+  letter-spacing: 18px;
+  white-space: nowrap;
+  text-align: center;
+  pointer-events: none;
+  animation: horrorDrift 5s infinite alternate ease-in-out;
+}
+
+.horrorMode::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.025) 0,
+      rgba(255,255,255,.025) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    radial-gradient(circle at center, transparent 42%, rgba(0,0,0,.58) 100%);
+  mix-blend-mode: screen;
+}
+
+.horrorMode .hero,
+.horrorMode .notice,
+.horrorMode .statsBox,
+.horrorMode .searchBox,
+.horrorMode .resultBox,
+.horrorMode .timelineBox,
+.horrorMode .featuredBox,
+.horrorMode .profileLinkBox,
+.horrorMode .songRankingBox,
+.horrorMode .categoryFilterBox,
+.horrorMode .memberInviteBox,
+.horrorMode .policyBox,
+.horrorMode .quickIndexBox {
+  border-color: rgba(180, 0, 32, .48);
+  background:
+    radial-gradient(circle at top right, rgba(170, 0, 30, .18), transparent 180px),
+    linear-gradient(135deg, rgba(20,0,8,.92), rgba(42,0,10,.86)) !important;
+  box-shadow: 0 0 26px rgba(120, 0, 20, .32);
+}
+
+.horrorMode .hero__image {
+  border-color: rgba(70, 0, 12, .92);
+  filter: grayscale(.85) contrast(1.28) brightness(.58) saturate(.7);
+  transform: rotate(-1deg) scale(.985);
+  box-shadow: 0 0 34px rgba(180, 0, 30, .32);
+}
+
+.horrorMode h1,
+.horrorMode h2,
+.horrorMode h3,
+.horrorMode .cardTitle,
+.horrorMode .rankingTitle {
+  color: #ffb7c3 !important;
+  text-shadow: 1px 1px 0 #210006, 0 0 10px rgba(255, 50, 80, .28);
+}
+
+.horrorMode p,
+.horrorMode .lead,
+.horrorMode .cardMeta,
+.horrorMode .statLabel,
+.horrorMode .statNote,
+.horrorMode .filterHint,
+.horrorMode .filterResult,
+.horrorMode .quickIndexInlineNote {
+  color: #d8c4c8 !important;
+}
+
+.horrorMode .search,
+.horrorMode .timelineFilters input,
+.horrorMode .quickIndexItem,
+.horrorMode .categoryButton {
+  border-color: rgba(180, 0, 32, .42);
+  background: rgba(12,0,5,.82);
+  color: #f4d9de;
+}
+
+.horrorMode .links a,
+.horrorMode .openLink,
+.horrorMode .profileLinkButton,
+.horrorMode .memberInviteButton,
+.horrorMode .rankingListenButton,
+.horrorMode .searchClearButton,
+.horrorMode .filterClearButton,
+.horrorMode .quickIndexMiniButton,
+.horrorMode .quickIndexMiniButtonGreen {
+  background: linear-gradient(135deg, #52000e, #a60024) !important;
+  color: #fff !important;
+  box-shadow: 0 0 18px rgba(180, 0, 32, .35);
+}
+
+.horrorMode .card,
+.horrorMode .songHit,
+.horrorMode .rankingItem,
+.horrorMode .featuredCard,
+.horrorMode .memberInviteCard,
+.horrorMode .quickIndexColumn {
+  border-color: rgba(180, 0, 32, .42);
+  background: rgba(18, 0, 6, .86);
+}
+
+@keyframes horrorDrift {
+  from {
+    transform: translateX(-18px);
+  }
+  to {
+    transform: translateX(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .horrorMode::before {
+    animation: none;
+  }
+}
