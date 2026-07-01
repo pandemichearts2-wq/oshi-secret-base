@@ -1298,3 +1298,42 @@ main {
 .quickIndexBox {
   margin-top: 12px;
 }
+
+/* 曲名一覧・アーティスト一覧ボタン：通常の丸ボタンに調整 */
+.quickIndexMiniButton,
+.quickIndexMiniButtonGreen {
+  position: static;
+  flex: 1 1 140px;
+  min-height: auto;
+  border: 1px solid #ead7b0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #6b5200;
+  background: #fff;
+  box-shadow: 0 5px 12px rgba(112, 84, 70, 0.07);
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.quickIndexMiniButton::before,
+.quickIndexMiniButton::after,
+.quickIndexMiniButtonGreen::before,
+.quickIndexMiniButtonGreen::after {
+  content: none;
+}
+
+.quickIndexMiniButton:hover,
+.quickIndexMiniButton:focus-visible,
+.quickIndexMiniButtonGreen:hover,
+.quickIndexMiniButtonGreen:focus-visible {
+  color: #fff;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  transform: translateY(-1px);
+  filter: none;
+  outline: none;
+  box-shadow: 0 8px 16px rgba(112, 84, 70, 0.11);
+}
+
