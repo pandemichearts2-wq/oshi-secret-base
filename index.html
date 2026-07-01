@@ -45,7 +45,7 @@
     </div>
     <div class="hero__content">
       <p class="eyebrow">非公式ファンメイドアーカイブ</p>
-      <h1>🍏物置の秘密基地<button id="sampleVoiceButton" class="sampleVoiceButton" type="button" aria-label="サンプルボイスを再生">🍎</button></h1>
+      <h1>🍏物置の秘密基地<span id="sampleVoiceButton" class="sampleVoiceHiddenTrigger" role="button" tabindex="0" aria-label="サンプルボイスを再生">🍎</span></h1>
 <audio id="sampleVoiceAudio" src="./sample-voice.mp4" preload="auto"></audio>
 <p class="lead" style="margin-left: 1px;">-水森りんごの軌跡を辿る時間旅行へようこそ-</p>
 <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
@@ -167,27 +167,26 @@
   <script src="./app.js?v=135"></script>
   <script>
     (function () {
-      const button = document.getElementById('sampleVoiceButton');
+      const trigger = document.getElementById('sampleVoiceButton');
       const audio = document.getElementById('sampleVoiceAudio');
 
-      if (!button || !audio) return;
+      if (!trigger || !audio) return;
 
-      button.addEventListener('click', async () => {
+      const playSampleVoice = async () => {
         try {
           audio.currentTime = 0;
           await audio.play();
-          button.classList.add('isPlaying');
         } catch (error) {
           console.warn('Sample voice playback failed', error);
         }
-      });
+      };
 
-      audio.addEventListener('ended', () => {
-        button.classList.remove('isPlaying');
-      });
-
-      audio.addEventListener('pause', () => {
-        button.classList.remove('isPlaying');
+      trigger.addEventListener('click', playSampleVoice);
+      trigger.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          playSampleVoice();
+        }
       });
     })();
   </script>
