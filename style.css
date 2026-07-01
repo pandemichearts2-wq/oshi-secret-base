@@ -809,3 +809,80 @@ main {
     margin-top: 6px;
   }
 }
+
+
+/* メンバーシップ案内：既存デザインに合わせて追加 */
+.memberInviteBox {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 190, 202, .28), transparent 190px),
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(234,255,244,.92));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 22px 0;
+}
+
+.memberInviteBox::after {
+  content: "🍏";
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-size: 34px;
+  opacity: .18;
+}
+
+.memberInviteCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255,255,255,.92);
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.08);
+}
+
+.memberInviteCard h3 {
+  margin: 0 0 6px;
+  color: #493431;
+  font-weight: 950;
+}
+
+.memberInviteCard p {
+  margin: 0;
+  color: var(--sub);
+  font-weight: 800;
+}
+
+.memberInviteButton {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  box-shadow: 0 8px 18px rgba(112, 84, 70, 0.16);
+  font-weight: 950;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.memberInviteButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+@media (max-width: 760px) {
+  .memberInviteCard {
+    display: block;
+  }
+
+  .memberInviteButton {
+    display: inline-block;
+    margin-top: 12px;
+  }
+}
