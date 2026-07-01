@@ -949,7 +949,7 @@ function renderSongs() {
 
     const originalSongTitle = getSongTitle(song) || getPerformanceSongTitle(performance);
     const songTitle = cleanSongTitleForRanking(originalSongTitle);
-    const artist = getSongArtistForSearch(song);
+    const artist = cleanArtistForSearch(getSongArtist(song));
 
     if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
 
@@ -1084,10 +1084,12 @@ function getQuickIndexSortGroup(value) {
 
   const first = key.charAt(0);
 
+  // 日本語の見やすさ優先：
+  // かな → 漢字 → アルファベット → 数字 → その他
   if (/^[ぁ-ん]/.test(first)) return 1;
-  if (/^[a-z]/.test(first)) return 2;
-  if (/^[0-9]/.test(first)) return 3;
-  if (/^[一-龥々〆ヵヶ]/.test(first)) return 4;
+  if (/^[一-龥々〆ヵヶ]/.test(first)) return 2;
+  if (/^[a-z]/.test(first)) return 3;
+  if (/^[0-9]/.test(first)) return 4;
 
   return 8;
 }
@@ -1114,6 +1116,24 @@ function compareQuickIndexText(a, b) {
   });
 }
 
+
+function isLikelyArtistName(value) {
+  const text = String(value || '').trim();
+  if (!text) return false;
+
+  const normalizedText = normalize(text);
+  if (!normalizedText) return false;
+
+  if (isUnsetSongTitle(text) || isIgnoredSongTitle(text)) return false;
+
+  // アーティスト欄に混ざりやすい説明・配信メモ系は一覧から除外する
+  if (/[0-9０-９]{1,2}[:：][0-9０-９]{2}/.test(text)) return false;
+  if (/https?:\/\//i.test(text)) return false;
+  if (/(歌枠|雑談|配信|ライブ|live|shorts|切り抜き|メドレー|リレー|耐久|初見|記念|コラボ|枠|回目|弾き語り|カラオケ|karaoke|cover|covered|歌ってみた|歌唱|セトリ|セットリスト)/i.test(text)) return false;
+
+  return true;
+}
+
 function getQuickIndexItems() {
   const songMap = new Map();
   const artistMap = new Map();
@@ -1128,7 +1148,7 @@ function getQuickIndexItems() {
       if (!songMap.has(key)) songMap.set(key, title);
     }
 
-    if (artist) {
+    if (isLikelyArtistName(artist)) {
       const key = normalize(artist);
       if (key && !artistMap.has(key)) artistMap.set(key, artist);
     }
