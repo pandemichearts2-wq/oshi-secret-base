@@ -176,6 +176,15 @@ function normalizeSongRankingKey(title) {
     .trim();
 }
 
+function isUnsetSongTitle(title) {
+  const key = normalize(String(title || ''))
+    .replace(/[♪♫🎵🎶]/g, '')
+    .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
+    .trim();
+
+  return !key || key === '曲名未設定' || key === '未設定' || key === 'undefined' || key === 'null';
+}
+
 function isIgnoredSongTitle(title) {
   const key = normalize(String(title || ''))
     .replace(/[♪♫🎵🎶]/g, '')
@@ -236,7 +245,7 @@ function getActualPerformanceCount() {
 
     const songTitle = getSongTitle(song);
     const artist = getSongArtist(song);
-    if (isIgnoredSongTitle(songTitle)) return;
+    if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
     const songKey = normalizeSongGroupKey(songTitle, artist);
 
     const uniqueKey = [
@@ -775,7 +784,7 @@ function getSongRanking(limit = 5) {
     const originalSongTitle = getSongTitle(song);
     const songTitle = cleanSongTitleForRanking(originalSongTitle);
     const artist = getSongArtist(song);
-    if (isIgnoredSongTitle(songTitle)) return;
+    if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
     const groupKey = normalizeSongRankingKey(songTitle);
     const uniquePerformanceKey = [
       String(videoId || '').trim(),
@@ -877,7 +886,7 @@ function renderSongs() {
     const song = songsById.get(songId) || {};
     const video = videosById.get(videoId) || {};
 
-    if (isIgnoredSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance))) return false;
+    if (isUnsetSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance)) || isIgnoredSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance))) return false;
 
     const text = normalize([
       getSongTitle(song),
@@ -911,7 +920,7 @@ function renderSongs() {
     const originalSongTitle = getSongTitle(song);
     const songTitle = cleanSongTitleForRanking(originalSongTitle);
     const artist = getSongArtist(song);
-    if (isIgnoredSongTitle(songTitle)) return;
+    if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
     const groupKey = normalizeSongRankingKey(songTitle);
 
     const dateTime = new Date(getVideoDate(video)).getTime();
