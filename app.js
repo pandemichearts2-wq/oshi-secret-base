@@ -1067,7 +1067,76 @@ function safeRender_(name, fn) {
   }
 }
 
+
+function getQuickIndexItems() {
+  const songMap = new Map();
+  const artistMap = new Map();
+
+  DATA.songs.forEach((song) => {
+    const rawTitle = getSongTitle(song);
+    const title = cleanSongTitleForRanking(rawTitle);
+    const artist = getSongArtistForSearch(song);
+
+    if (title && !isUnsetSongTitle(title) && !isIgnoredSongTitle(title)) {
+      const key = normalizeSongRankingKey(title);
+      if (!songMap.has(key)) songMap.set(key, title);
+    }
+
+    if (artist) {
+      const key = normalize(artist);
+      if (key && !artistMap.has(key)) artistMap.set(key, artist);
+    }
+  });
+
+  const songs = Array.from(songMap.values())
+    .sort((a, b) => String(a).localeCompare(String(b), 'ja'));
+
+  const artists = Array.from(artistMap.values())
+    .sort((a, b) => String(a).localeCompare(String(b), 'ja'));
+
+  return { songs, artists };
+}
+
+function quickIndexButton(kind, value) {
+  return `<button type="button" class="quickIndexItem" data-kind="${escapeHtml(kind)}" data-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`;
+}
+
+function renderQuickIndex() {
+  const songRoot = $('#songTitleIndex');
+  const artistRoot = $('#artistIndex');
+
+  if (!songRoot || !artistRoot) return;
+
+  const { songs, artists } = getQuickIndexItems();
+
+  songRoot.innerHTML = songs.length
+    ? songs.map((title) => quickIndexButton('song', title)).join('')
+    : '<p>表示できる曲名がありません。</p>';
+
+  artistRoot.innerHTML = artists.length
+    ? artists.map((artist) => quickIndexButton('artist', artist)).join('')
+    : '<p>表示できるアーティスト名がありません。</p>';
+}
+
+function applyQuickIndexValue(kind, value) {
+  const songTitleSearch = $('#songTitleSearch') || $('#songSearch');
+  const artistSearch = $('#artistSearch');
+
+  if (kind === 'song' && songTitleSearch) {
+    songTitleSearch.value = value;
+    songTitleSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    songTitleSearch.focus();
+  }
+
+  if (kind === 'artist' && artistSearch) {
+    artistSearch.value = value;
+    artistSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    artistSearch.focus();
+  }
+}
+
 function renderAll() {
+  safeRender_('renderQuickIndex', renderQuickIndex);
   safeRender_('renderProfileLink', renderProfileLink);
   safeRender_('renderFeaturedVideos', renderFeaturedVideos);
   safeRender_('renderSongRanking', renderSongRanking);
@@ -1121,6 +1190,44 @@ function setupSearches() {
       renderSongs();
     });
   }
+
+
+  const songTitleIndexToggle = $('#songTitleIndexToggle');
+  const artistIndexToggle = $('#artistIndexToggle');
+  const quickIndexPanel = $('#quickIndexPanel');
+  const songTitleIndex = $('#songTitleIndex');
+  const artistIndex = $('#artistIndex');
+
+  function showQuickIndex(target) {
+    if (!quickIndexPanel || !songTitleIndex || !artistIndex) return;
+
+    quickIndexPanel.hidden = false;
+    songTitleIndex.closest('.quickIndexColumn').hidden = target === 'artist';
+    artistIndex.closest('.quickIndexColumn').hidden = target === 'song';
+  }
+
+  if (songTitleIndexToggle) {
+    songTitleIndexToggle.addEventListener('click', () => {
+      showQuickIndex('song');
+    });
+  }
+
+  if (artistIndexToggle) {
+    artistIndexToggle.addEventListener('click', () => {
+      showQuickIndex('artist');
+    });
+  }
+
+  [songTitleIndex, artistIndex].forEach((root) => {
+    if (!root) return;
+
+    root.addEventListener('click', (event) => {
+      const button = event.target.closest('.quickIndexItem');
+      if (!button) return;
+
+      applyQuickIndexValue(button.dataset.kind || '', button.dataset.value || '');
+    });
+  });
 
   ['#timelineYear', '#timelineMonth', '#timelineDay'].forEach((selector) => {
     const input = $(selector);
