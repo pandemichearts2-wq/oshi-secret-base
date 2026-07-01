@@ -880,3 +880,17 @@ main {
     margin-top: 12px;
   }
 }
+
+/* サンプルボイス隠しクリック範囲 */
+.sampleVoiceHiddenTrigger {
+  display: inline;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sampleVoiceHiddenTrigger:focus {
+  outline: none;
+}
