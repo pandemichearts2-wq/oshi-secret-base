@@ -172,8 +172,8 @@ function cleanSongTitleForRanking(title) {
 
   // 先頭に混ざった区切り記号を除去
   text = text
-    .replace(/^[\s:：・／/｜|\-－—–]+/, '')
-    .replace(/[\s:：・／/｜|\-－—–]+$/, '')
+    .replace(/^[\s:：・／/｜|\-－—–〜～~]+/, '')
+    .replace(/[\s:：・／/｜|\-－—–〜～~]+$/, '')
     .trim();
 
   // 「ver」「cover」などが曲名側に混ざった場合の表記ゆれを軽く吸収
@@ -189,8 +189,8 @@ function cleanArtistForSearch(artist) {
   return String(artist || '')
     .replace(/[♪♫🎵🎶]/g, '')
     .replace(/[「」『』【】（）()［］\[\]！!？?]/g, '')
-    .replace(/^[\s:：・／/｜|\-－—–]+/, '')
-    .replace(/[\s:：・／/｜|\-－—–]+$/, '')
+    .replace(/^[\s:：・／/｜|\-－—–〜～~]+/, '')
+    .replace(/[\s:：・／/｜|\-－—–〜～~]+$/, '')
     .trim();
 }
 
@@ -1018,7 +1018,18 @@ function renderSongs() {
   const hits = Array.from(grouped.values())
     .sort((a, b) => b.latest.dateTime - a.latest.dateTime || String(a.songTitle || '').localeCompare(String(b.songTitle || ''), 'ja'));
 
-  root.innerHTML = hits.map((group) => {
+  // 同じ配信タイトルは検索結果に1件だけ表示する
+  const visibleHits = [];
+  const seenVideoTitles = new Set();
+
+  hits.forEach((group) => {
+    const videoTitleKey = normalize(getVideoTitle(group.latest.video));
+    if (videoTitleKey && seenVideoTitles.has(videoTitleKey)) return;
+    if (videoTitleKey) seenVideoTitles.add(videoTitleKey);
+    visibleHits.push(group);
+  });
+
+  root.innerHTML = visibleHits.map((group) => {
     const { songTitle, artist, count, latest } = group;
 
     const performance = latest.performance;
