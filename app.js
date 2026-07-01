@@ -1078,15 +1078,32 @@ function renderAll() {
   safeRender_('renderSongs', renderSongs);
 }
 
+
+function resetSearchInput(input) {
+  if (!input) return;
+  input.value = '';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 function setupSearches() {
   const videoSearch = $('#videoSearch');
+  const videoSearchClear = $('#videoSearchClear');
   const songTitleSearch = $('#songTitleSearch') || $('#songSearch');
   const artistSearch = $('#artistSearch');
+  const songSearchClear = $('#songSearchClear');
 
   if (videoSearch) {
     videoSearch.addEventListener('input', renderVideos);
     videoSearch.addEventListener('change', renderVideos);
     videoSearch.addEventListener('keyup', renderVideos);
+  }
+
+  if (videoSearchClear) {
+    videoSearchClear.addEventListener('click', () => {
+      resetSearchInput(videoSearch);
+      if (videoSearch) videoSearch.focus();
+      renderVideos();
+    });
   }
 
   [songTitleSearch, artistSearch].forEach((input) => {
@@ -1095,6 +1112,15 @@ function setupSearches() {
     input.addEventListener('change', renderSongs);
     input.addEventListener('keyup', renderSongs);
   });
+
+  if (songSearchClear) {
+    songSearchClear.addEventListener('click', () => {
+      resetSearchInput(songTitleSearch);
+      resetSearchInput(artistSearch);
+      if (songTitleSearch) songTitleSearch.focus();
+      renderSongs();
+    });
+  }
 
   ['#timelineYear', '#timelineMonth', '#timelineDay'].forEach((selector) => {
     const input = $(selector);
