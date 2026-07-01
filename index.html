@@ -1,197 +1,30 @@
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🍏物置の秘密基地🍎</title>
-  <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
-  <link rel="stylesheet" href="./style.css?v=13" />
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; background: #fffaf7; line-height: 1.7; }
-    a { color: #0b6b63; }
-    .hero { display: grid; grid-template-columns: minmax(240px, 520px) 1fr; gap: 28px; align-items: center; padding: 28px; background: linear-gradient(135deg, #fff3ef, #f0fffb); border-bottom: 1px solid #f0ddd6; }
-    .hero__image { width: 100%; height: auto; max-width: 520px; display: block; border-radius: 18px; }
-    .hero__content h1 { margin: 6px 0 10px; font-size: clamp(2rem, 4vw, 3.6rem); }
-    .eyebrow { font-weight: 700; color: #0b6b63; margin: 0; }
-    .lead { font-size: 1.05rem; margin: 0 0 16px; }
-    .links { display: flex; flex-wrap: wrap; gap: 10px; }
-    .links a, .openLink { display: inline-block; border: 1px solid #0b6b63; border-radius: 999px; padding: 8px 14px; background: #fff; color: #0b6b63; text-decoration: none; font-weight: 700; }
-    .container { width: min(1120px, calc(100% - 28px)); margin: 24px auto 48px; }
-    .notice, .toolbar, .searchBox, .resultBox, .timelineBox { background: #fff; border: 1px solid #eee0db; border-radius: 18px; padding: 16px; margin-bottom: 18px; box-shadow: 0 4px 18px rgba(80, 40, 20, 0.05); }
-    .toolbar { display: flex; justify-content: space-between; gap: 14px; align-items: center; flex-wrap: wrap; }
-    .status { font-weight: 700; color: #0b6b63; }
-    .searchGrid, .resultGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
-    .searchBox label { display: block; font-weight: 700; margin-bottom: 8px; }
-    .search { width: 100%; min-height: 42px; border: 1px solid #ddd; border-radius: 12px; padding: 9px 12px; font-size: 1rem; }
-    .resultBox h2, .timelineBox h2 { margin: 0 0 8px; font-size: 1.35rem; }
-    .cards { display: grid; gap: 12px; }
-    .card { display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start; padding: 10px; border: 1px solid #eee; border-radius: 14px; background: #fffdfb; }
-    .card img { width: 140px; height: 79px; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
-    .cardTitle { font-weight: 800; margin-bottom: 4px; }
-    .cardMeta { color: #666; font-size: 0.92rem; margin-bottom: 6px; }
-    .songResults { display: grid; gap: 10px; }
-    .songHit { padding: 12px; border: 1px solid #eee; border-radius: 14px; background: #fffdfb; }
-    .monthGroup { margin-bottom: 22px; }
-    .monthGroup h3 { border-left: 6px solid #0b6b63; padding-left: 10px; margin-bottom: 12px; }
-    .footer { text-align: center; padding: 24px; color: #555; }
-    @media (max-width: 800px) { .hero, .searchGrid, .resultGrid { grid-template-columns: 1fr; } .card { grid-template-columns: 1fr; } .card img { width: 100%; height: auto; max-height: 220px; } }
-  </style>
-</head>
-<body>
-  <header class="hero">
-    <div class="hero__imageWrap">
-      <img class="hero__image" src="./hero.png" alt="物置の秘密基地 見出しイラスト" />
-    </div>
-    <div class="hero__content">
-      <p class="eyebrow">非公式ファンメイドアーカイブ</p>
-      <h1>🍏物置の秘密基地<span id="sampleVoiceButton" class="sampleVoiceHiddenTrigger" role="button" tabindex="0" aria-label="サンプルボイスを再生">🍎</span></h1>
-<audio id="sampleVoiceAudio" src="./sample-voice.mp4" preload="auto"></audio>
-<p class="lead" style="margin-left: 1px;">-水森りんごの軌跡を辿る時間旅行へようこそ-</p>
-<p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
-      <nav class="links" aria-label="公式リンク">
-        <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
-        <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
-        <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
-      </nav>
-    </div>
-  </header>
-  <main class="container">
-    <section class="profileLinkBox" aria-label="プロフィール">
-      <div>
-        <h2>プロフィール・リンク</h2>
-        <p>詳しいプロフィール、各種タグ、リンクはリットリンクにまとまっています。</p>
-      </div>
-      <a id="litlinkHighlight" class="profileLinkButton" href="#" target="_blank" rel="noopener noreferrer">リットリンクを見る</a>
-    </section>
-    <section class="statsBox" aria-label="活動サマリー">
-      <h2>活動サマリー</h2>
-      <div id="statsSummary" class="statsGrid">
-        <p>集計中...</p>
-      </div>
-    </section>
-    <section class="featuredBox" aria-label="まず見るならこれ">
-      <div class="sectionHead">
-        <h2>まず見るならこれ！</h2>
-        <p>初見さんにまず見てほしい動画・配信をまとめました。</p>
-      </div>
-      <div id="featuredVideos" class="featuredGrid">
-        <p>おすすめ動画を読み込み中...</p>
-      </div>
-    </section>
-    <section class="memberInviteBox" aria-label="メンバーシップ案内">
-      <div class="sectionHead">
-        <h2>もっと近くで応援したい方へ</h2>
-        <p>
-          水森りんごさんの活動をもっと応援したい方は、YouTubeメンバーシップもおすすめです。
-          限定配信やメンバー向けの楽しみが増えて、日々の応援がもっと特別になります。
-        </p>
-      </div>
-      <div class="memberInviteCard">
-        <div>
-          <h3>メンバーシップで応援する</h3>
-          <p>
-            このサイトではメン限の内容は転載せず、公開情報のアーカイブとして運用しています。
-            気になった方は、公式YouTubeチャンネルからメンバーシップをご確認ください。
-          </p>
-        </div>
-        <a id="membershipLink" class="memberInviteButton" href="https://www.youtube.com/@mimori_ch/join" target="_blank" rel="noopener noreferrer">メンバーシップを見る</a>
-      </div>
-    </section>
-    <section class="songRankingBox" aria-label="歌枠ランキング">
-      <div class="sectionHead">
-        <h2>よく歌っている曲 TOP5</h2>
-        <p>歌唱履歴から、歌唱回数が多い曲を集計しています。</p>
-      </div>
-      <div id="songRanking" class="songRankingList">
-        <p>ランキングを読み込み中...</p>
-      </div>
-    </section>
-    <section class="searchGrid" aria-label="検索欄">
-      <div class="searchBox">
-        <label for="videoSearch">配信タイトル検索</label>
-        <input id="videoSearch" class="search" type="search" placeholder="例：歌枠、雑談、記念、ゲーム" />
-      </div>
-      <div class="searchBox">
-        <label for="songTitleSearch">歌枠 曲検索</label>
-        <div class="songSearchSplit">
-          <input id="songTitleSearch" class="search" type="search" placeholder="曲名で検索" />
-          <input id="artistSearch" class="search" type="search" placeholder="アーティスト名で検索" />
-        </div>
-      </div>
-    </section>
-    <section class="resultGrid" aria-label="検索結果">
-      <div class="resultBox">
-        <h2>配信タイトル検索 結果</h2>
-        <div id="videoResults" class="cards"><p>検索ワードを入れると配信が表示されます。</p></div>
-      </div>
-      <div class="resultBox">
-        <h2>歌枠 曲検索 結果</h2>
-        <div id="songResults" class="songResults"><p>検索ワードを入れると曲が表示されます。</p></div>
-      </div>
-    </section>
-    <section class="timelineBox">
-      <div class="sectionHead">
-        <h2>配信の軌跡</h2>
-        <p>年・月・日で配信を絞り込めます。</p>
-      </div>
-      <div class="timelineFilters" aria-label="配信の軌跡 絞り込み">
-        <label>
-          年
-          <input id="timelineYear" type="number" inputmode="numeric" min="2000" max="2100" placeholder="例：2026" />
-        </label>
-        <label>
-          月
-          <input id="timelineMonth" type="number" inputmode="numeric" min="1" max="12" placeholder="例：6" />
-        </label>
-        <label>
-          日
-          <input id="timelineDay" type="number" inputmode="numeric" min="1" max="31" placeholder="例：25" />
-        </label>
-        <button id="timelineClear" class="filterClearButton" type="button">絞り込み解除</button>
-        <p class="filterHint">例：2026年6月25日 / 2026年6月 / 2026年 / 6月 / 25日 のように、入れた項目だけで絞り込めます。</p>
-      </div>
-      <div class="categoryFilterBox" aria-label="カテゴリ別まとめ">
-        <div class="categoryFilterTitle">カテゴリ別まとめ</div>
-        <div id="categoryButtons" class="categoryButtons">
-          <p>カテゴリを読み込み中...</p>
-        </div>
-      </div>
-      <div id="timelineList" class="timeline"></div>
-    </section>
-  </main>
-  <section class="policyBox" aria-label="運用方針">
-    <p>運用方針： 公開中の公式リンクと有志様のタイムスタンプ索引を扱います。動画・音声・歌詞・非公開化された内容（メン限）の転載はしません。 水森りんご様の既存の公開配信及び動画を公開する想定です。</p>
-  </section>
-  <footer class="footer">
-    <p>🍏物置の秘密基地🍎 / 非公式ファンメイドツール</p>
-  </footer>
-  <script src="./config.js"></script>
-  <script src="./app.js?v=137"></script>
-  <script>
-    (function () {
-      const trigger = document.getElementById('sampleVoiceButton');
-      const audio = document.getElementById('sampleVoiceAudio');
 
-      if (!trigger || !audio) return;
+DE
+配信タイトル検索 結果
+検索ワードを入れると配信が表示されます。
 
-      const playSampleVoice = async () => {
-        try {
-          audio.currentTime = 0;
-          await audio.play();
-        } catch (error) {
-          console.warn('Sample voice playback failed', error);
-        }
-      };
-
-      trigger.addEventListener('click', playSampleVoice);
-      trigger.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          playSampleVoice();
-        }
-      });
-    })();
-  </script>
-</body>
-</html>
+歌枠 曲検索 結果
+only my railgun / FripSide
+【 歌枠 】 気まぐれに平成の歌中心に歌います 【 #新人Vtuber / #りんごの御茶会 】
+2026年4月13日 / 16:30:39 / 歌唱回数 2回
+最新の該当配信へ飛ぶ
+夢であるように / DEEN
+【 #歌枠 】 水森琳吾のエイプリルフール歌枠！！！ 【 #新人Vtuber / #りんごの御茶会 】
+2026年4月2日 / 15:58:25 / 歌唱回数 6回
+最新の該当配信へ飛ぶ
+シュガーソングとビターステップ / UNISON SQUARE GARDEN
+【 #歌枠 】 病み上がりだけど第3回歌枠グランプリ参加中の歌枠！！ 【 #新人Vtuber / #りんごの御茶会 】
+2026年2月23日 / 15:58:14 / 歌唱回数 2回
+最新の該当配信へ飛ぶ
+〜 モニタリングBest Friend Remix / DECO*27 fast.初音ミク
+【 #歌枠 】ハロウィンソングリベンジしますよっ　【 #新人Vtuber / #りんごの御茶会 】
+2025年10月9日 / 15:29:22
+最新の該当配信へ飛ぶ
+モニタリングBest Friend Remix / DECO*27 fast.初音ミク
+【 #歌枠 】ハロウィンソングリベンジしますよっ　【 #新人Vtuber / #りんごの御茶会 】
+2025年10月9日 / 15:29:22 / 歌唱回数 2回
+最新の該当配信へ飛ぶ
+モニタリング / DECO*27 fast.初音ミク
+【朝活雑談】登録者様９００人を目指して朝雑談【 #新人Vtuber / #りんごの御茶会 】
+2025年6月22日 / 18:23:26
+最新の該当配信へ飛ぶ
