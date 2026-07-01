@@ -1038,3 +1038,22 @@ main {
     min-width: 112px;
   }
 }
+/* 赤りんごリセットボタン：ホバー時に白くなる問題の修正 */
+.searchClearButton,
+.searchClearButton:hover,
+.searchClearButton:focus-visible {
+  color: #fff !important;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.34), transparent 26%),
+    linear-gradient(135deg, #f47f93 0%, #ef6f7d 44%, #df5f6e 100%) !important;
+}
+
+.searchClearButton:hover,
+.searchClearButton:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.22),
+    0 12px 24px rgba(112, 84, 70, 0.22);
+  outline: none;
+}
