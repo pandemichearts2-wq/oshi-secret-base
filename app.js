@@ -1018,17 +1018,7 @@ function renderSongs() {
   const hits = Array.from(grouped.values())
     .sort((a, b) => b.latest.dateTime - a.latest.dateTime || String(a.songTitle || '').localeCompare(String(b.songTitle || ''), 'ja'));
 
-  const visibleHits = [];
-  const seenVideoTitles = new Set();
-
-  hits.forEach((group) => {
-    const videoTitleKey = normalize(getVideoTitle(group.latest.video));
-    if (videoTitleKey && seenVideoTitles.has(videoTitleKey)) return;
-    if (videoTitleKey) seenVideoTitles.add(videoTitleKey);
-    visibleHits.push(group);
-  });
-
-  root.innerHTML = visibleHits.map((group) => {
+  root.innerHTML = hits.map((group) => {
     const { songTitle, artist, count, latest } = group;
 
     const performance = latest.performance;
