@@ -1057,3 +1057,244 @@ main {
     0 12px 24px rgba(112, 84, 70, 0.22);
   outline: none;
 }
+
+/* 曲・アーティスト早見表 */
+.quickIndexBox {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 190, 202, .28), transparent 190px),
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(255, 250, 240, .94));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.quickIndexBox::after {
+  content: "🍎";
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-size: 34px;
+  opacity: .16;
+}
+
+.quickIndexToggleButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 11px 18px 11px 20px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 46% 46% 44% 44% / 56% 56% 42% 42%;
+  color: #fff;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.34), transparent 26%),
+    linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.22),
+    0 8px 18px rgba(112, 84, 70, 0.18);
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.quickIndexToggleButton::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 14px;
+  height: 10px;
+  margin-left: 2px;
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, #81d29b, #4fa06b);
+  transform: rotate(-18deg);
+}
+
+.quickIndexToggleButton::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: calc(50% - 2px);
+  width: 3px;
+  height: 10px;
+  border-radius: 999px;
+  background: #7c5647;
+}
+
+.quickIndexToggleButton:hover,
+.quickIndexToggleButton:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.04);
+  outline: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.22),
+    0 12px 24px rgba(112, 84, 70, 0.22);
+}
+
+.quickIndexPanel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.quickIndexPanel[hidden] {
+  display: none;
+}
+
+.quickIndexColumn {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.88);
+  padding: 14px;
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.07);
+}
+
+.quickIndexColumn h3 {
+  margin: 0 0 10px;
+  color: #0b7563;
+  font-size: 1.02rem;
+  font-weight: 950;
+}
+
+.quickIndexList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.quickIndexItem {
+  border: 1px solid rgba(239, 111, 125, .28);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: #6f514b;
+  background: #fff;
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(112, 84, 70, 0.07);
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.quickIndexItem:hover,
+.quickIndexItem:focus-visible {
+  background: #fff7fb;
+  transform: translateY(-1px);
+  outline: none;
+  box-shadow: 0 8px 16px rgba(112, 84, 70, 0.11);
+}
+
+@media (max-width: 760px) {
+  .quickIndexPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .quickIndexList {
+    max-height: 230px;
+  }
+}
+
+/* 検索欄下の早見表ボタン */
+.quickIndexInlineButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.quickIndexMiniButton {
+  position: relative;
+  flex: 1 1 140px;
+  min-height: 42px;
+  padding: 10px 16px 10px 18px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 46% 46% 44% 44% / 56% 56% 42% 42%;
+  color: #fff;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.34), transparent 26%),
+    linear-gradient(135deg, #f47f93 0%, #ef6f7d 44%, #df5f6e 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.22),
+    0 8px 18px rgba(112, 84, 70, 0.16);
+  font: inherit;
+  font-size: .90rem;
+  font-weight: 950;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.quickIndexMiniButton::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 14px;
+  height: 10px;
+  margin-left: 2px;
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, #81d29b, #4fa06b);
+  transform: rotate(-18deg);
+}
+
+.quickIndexMiniButton::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: calc(50% - 2px);
+  width: 3px;
+  height: 10px;
+  border-radius: 999px;
+  background: #7c5647;
+}
+
+.quickIndexMiniButtonGreen {
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.34), transparent 26%),
+    linear-gradient(135deg, #87cf9c 0%, #69bd8a 46%, #53a873 100%);
+}
+
+.quickIndexMiniButtonGreen::before {
+  background: linear-gradient(135deg, #ffd574, #f5b54d);
+}
+
+.quickIndexMiniButton:hover,
+.quickIndexMiniButton:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.04);
+  outline: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.22),
+    0 12px 24px rgba(112, 84, 70, 0.22);
+}
+
+.quickIndexColumn[hidden] {
+  display: none;
+}
+
+.quickIndexPanel:has(.quickIndexColumn[hidden]) {
+  grid-template-columns: 1fr;
+}
+
+/* 早見表ボタン下の説明文 */
+.quickIndexInlineNote {
+  margin: 8px 0 0;
+  color: var(--sub);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.quickIndexBox {
+  margin-top: 12px;
+}
