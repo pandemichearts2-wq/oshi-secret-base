@@ -1068,6 +1068,52 @@ function safeRender_(name, fn) {
 }
 
 
+
+function toHiraganaForSort(value) {
+  return String(value || '')
+    .normalize('NFKC')
+    .replace(/^[\s"'“”‘’「」『』【】（）()［］\[\]{}<>＜＞:：;；,，.。・･!！?？\-ー―〜～~♪♫♬★☆◆◇■□●○◎※]+/g, '')
+    .replace(/[ァ-ン]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0x60))
+    .toLowerCase()
+    .trim();
+}
+
+function getQuickIndexSortGroup(value) {
+  const key = toHiraganaForSort(value);
+  if (!key) return 9;
+
+  const first = key.charAt(0);
+
+  if (/^[ぁ-ん]/.test(first)) return 1;
+  if (/^[a-z]/.test(first)) return 2;
+  if (/^[0-9]/.test(first)) return 3;
+  if (/^[一-龥々〆ヵヶ]/.test(first)) return 4;
+
+  return 8;
+}
+
+function compareQuickIndexText(a, b) {
+  const groupA = getQuickIndexSortGroup(a);
+  const groupB = getQuickIndexSortGroup(b);
+
+  if (groupA !== groupB) return groupA - groupB;
+
+  const keyA = toHiraganaForSort(a);
+  const keyB = toHiraganaForSort(b);
+
+  const compared = keyA.localeCompare(keyB, 'ja-JP', {
+    numeric: true,
+    sensitivity: 'base'
+  });
+
+  if (compared !== 0) return compared;
+
+  return String(a).localeCompare(String(b), 'ja-JP', {
+    numeric: true,
+    sensitivity: 'base'
+  });
+}
+
 function getQuickIndexItems() {
   const songMap = new Map();
   const artistMap = new Map();
@@ -1089,10 +1135,10 @@ function getQuickIndexItems() {
   });
 
   const songs = Array.from(songMap.values())
-    .sort((a, b) => String(a).localeCompare(String(b), 'ja'));
+    .sort(compareQuickIndexText);
 
   const artists = Array.from(artistMap.values())
-    .sort((a, b) => String(a).localeCompare(String(b), 'ja'));
+    .sort(compareQuickIndexText);
 
   return { songs, artists };
 }
