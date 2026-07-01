@@ -7,3 +7,4 @@ window.OSHI_CONFIG = {
 
   appsScriptUrl: "https://script.google.com/macros/s/AKfycbyKGrZQDjYneH5Q9KIFzni1Uh9dGzbIPSwD3UJobzIgO1f8FRJht2qmjEk-HenYbvdj/exec"
 };
+membershipUrl: "https://www.youtube.com/@mimori_ch/join",
