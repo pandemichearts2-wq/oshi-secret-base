@@ -894,3 +894,9 @@ main {
 .sampleVoiceHiddenTrigger:focus {
   outline: none;
 }
+
+/* 歌枠検索：曲名・アーティスト分割 */
+.songSearchSplit {
+  display: grid;
+  gap: 10px;
+}
