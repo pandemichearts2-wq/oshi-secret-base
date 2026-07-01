@@ -900,3 +900,36 @@ main {
   display: grid;
   gap: 10px;
 }
+
+/* 検索欄リセットボタン */
+.searchBoxHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.searchBoxHead label {
+  margin-bottom: 0;
+}
+
+.searchClearButton {
+  flex: 0 0 auto;
+  border: 1px solid rgba(239, 111, 125, .35);
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: var(--apple-red);
+  background: rgba(255, 255, 255, .86);
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(112, 84, 70, 0.08);
+}
+
+.searchClearButton:hover,
+.searchClearButton:focus-visible {
+  background: #fff7fb;
+  outline: none;
+}
