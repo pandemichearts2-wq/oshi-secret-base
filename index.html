@@ -1,3 +1,26 @@
+【メモ：index.html 丸ごと差し替え】
+
+目的：
+メンバーシップ案内ブロックを「まず見るならこれ！」の下へ追加する。
+
+差し替えるファイル：
+index.html
+
+使い方：
+1. index.html の中身を全部消す
+2. 下の「ここから」から「ここまで」の間を丸ごと貼る
+3. 保存する
+
+変更点：
+- style.css の読み込みを v=11 に更新
+- 「まず見るならこれ！」の下に memberInviteBox を追加
+- メンバーシップボタンに id="membershipLink" を付与
+- app.js の読み込みを v=135 に更新
+
+注意：
+メン限の内容は転載せず、公式メンバーシップへの案内だけにしている。
+
+----- ここから -----
 <!doctype html>
 <html lang="ja">
 <head>
@@ -5,7 +28,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🍏物置の秘密基地🍎</title>
   <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
-  <link rel="stylesheet" href="./style.css?v=10" />
+  <link rel="stylesheet" href="./style.css?v=11" />
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; background: #fffaf7; line-height: 1.7; }
@@ -78,6 +101,25 @@
         <p>おすすめ動画を読み込み中...</p>
       </div>
     </section>
+    <section class="memberInviteBox" aria-label="メンバーシップ案内">
+      <div class="sectionHead">
+        <h2>もっと近くで応援したい方へ</h2>
+        <p>
+          水森りんごさんの活動をもっと応援したい方は、YouTubeメンバーシップもおすすめです。
+          限定配信やメンバー向けの楽しみが増えて、日々の応援がもっと特別になります。
+        </p>
+      </div>
+      <div class="memberInviteCard">
+        <div>
+          <h3>メンバーシップで応援する</h3>
+          <p>
+            このサイトではメン限の内容は転載せず、公開情報のアーカイブとして運用しています。
+            気になった方は、公式YouTubeチャンネルからメンバーシップをご確認ください。
+          </p>
+        </div>
+        <a id="membershipLink" class="memberInviteButton" href="https://www.youtube.com/@mimori_ch/join" target="_blank" rel="noopener noreferrer">メンバーシップを見る</a>
+      </div>
+    </section>
     <section class="songRankingBox" aria-label="歌枠ランキング">
       <div class="sectionHead">
         <h2>よく歌っている曲 TOP5</h2>
@@ -138,12 +180,14 @@
     </section>
   </main>
   <section class="policyBox" aria-label="運用方針">
-    <p>運用方針： 公開中の公式リンクと有志様のタイムスタンプ索引を扱います。動画・音声・歌詞・非公開化された内容（メン限）の転載はご本人様の承認なしでは公開いたしません。 水森りんご様の既存の公開配信及び動画を公開する想定です。</p>
+    <p>運用方針： 公開中の公式リンクと有志様のタイムスタンプ索引を扱います。動画・音声・歌詞・非公開化された内容（メン限）の転載はしません。 水森りんご様の既存の公開配信及び動画を公開する想定です。</p>
   </section>
   <footer class="footer">
     <p>🍏物置の秘密基地🍎 / 非公式ファンメイドツール</p>
   </footer>
   <script src="./config.js"></script>
-  <script src="./app.js?v=134"></script>
+  <script src="./app.js?v=135"></script>
 </body>
 </html>
+
+----- ここまで -----
