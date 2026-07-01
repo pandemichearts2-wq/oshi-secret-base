@@ -120,6 +120,17 @@ function getSongArtist(song) {
   return getValue(song, ['artist', 'artistName', 'artist_name']);
 }
 
+function getSongArtistForSearch(song) {
+  const artist = getSongArtist(song);
+  if (artist) return artist;
+
+  const title = getSongTitle(song);
+  const slashParts = String(title || '').split(/[／/]/).map(s => s.trim()).filter(Boolean);
+  if (slashParts.length >= 2) return slashParts[1];
+
+  return '';
+}
+
 function getPerformanceSongId(performance) {
   return getValue(performance, ['songId', 'song_id']);
 }
@@ -866,13 +877,16 @@ function renderSongRanking() {
 }
 
 function renderSongs() {
-  const input = $('#songSearch');
+  const titleInput = $('#songTitleSearch') || $('#songSearch');
+  const artistInput = $('#artistSearch');
   const root = $('#songResults');
-  if (!input || !root) return;
+  if (!titleInput || !root) return;
 
-  const q = normalize(input.value);
-  if (!q) {
-    root.innerHTML = '<p>検索ワードを入れると曲が表示されます。</p>';
+  const titleQuery = normalize(titleInput.value);
+  const artistQuery = normalize(artistInput ? artistInput.value : '');
+
+  if (!titleQuery && !artistQuery) {
+    root.innerHTML = '<p>曲名かアーティスト名を入れると曲が表示されます。</p>';
     return;
   }
 
@@ -886,20 +900,27 @@ function renderSongs() {
     const song = songsById.get(songId) || {};
     const video = videosById.get(videoId) || {};
 
-    if (isUnsetSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance)) || isIgnoredSongTitle(getSongTitle(song) || getPerformanceSongTitle(performance))) return false;
+    const originalSongTitle = getSongTitle(song) || getPerformanceSongTitle(performance);
+    const cleanSongTitle = cleanSongTitleForRanking(originalSongTitle);
+    const artist = getSongArtistForSearch(song);
 
-    const text = normalize([
-      getSongTitle(song),
-      getSongArtist(song),
-      arrayToText(getValue(song, ['aliases', 'alias'])),
-      getPerformanceSongTitle(performance),
-      getPerformanceTimestamp(performance),
-      getVideoTitle(video),
-      objectText(song),
-      objectText(performance)
+    if (isUnsetSongTitle(cleanSongTitle) || isIgnoredSongTitle(cleanSongTitle)) return false;
+
+    const titleText = normalize([
+      cleanSongTitle,
+      originalSongTitle,
+      getPerformanceSongTitle(performance)
     ].join(' '));
 
-    return text.includes(q);
+    const artistText = normalize([
+      artist,
+      getSongArtist(song)
+    ].join(' '));
+
+    const matchesTitle = !titleQuery || titleText.includes(titleQuery);
+    const matchesArtist = !artistQuery || artistText.includes(artistQuery);
+
+    return matchesTitle && matchesArtist;
   });
 
   const grouped = new Map();
@@ -919,7 +940,7 @@ function renderSongs() {
 
     const originalSongTitle = getSongTitle(song);
     const songTitle = cleanSongTitleForRanking(originalSongTitle);
-    const artist = getSongArtist(song);
+    const artist = getSongArtistForSearch(song);
     if (isUnsetSongTitle(songTitle) || isIgnoredSongTitle(songTitle)) return;
     const groupKey = normalizeSongRankingKey(songTitle);
 
@@ -1026,7 +1047,8 @@ function renderAll() {
 
 function setupSearches() {
   const videoSearch = $('#videoSearch');
-  const songSearch = $('#songSearch');
+  const songTitleSearch = $('#songTitleSearch') || $('#songSearch');
+  const artistSearch = $('#artistSearch');
 
   if (videoSearch) {
     videoSearch.addEventListener('input', renderVideos);
@@ -1034,11 +1056,12 @@ function setupSearches() {
     videoSearch.addEventListener('keyup', renderVideos);
   }
 
-  if (songSearch) {
-    songSearch.addEventListener('input', renderSongs);
-    songSearch.addEventListener('change', renderSongs);
-    songSearch.addEventListener('keyup', renderSongs);
-  }
+  [songTitleSearch, artistSearch].forEach((input) => {
+    if (!input) return;
+    input.addEventListener('input', renderSongs);
+    input.addEventListener('change', renderSongs);
+    input.addEventListener('keyup', renderSongs);
+  });
 
   ['#timelineYear', '#timelineMonth', '#timelineDay'].forEach((selector) => {
     const input = $(selector);
