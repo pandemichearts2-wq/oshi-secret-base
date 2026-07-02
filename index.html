@@ -142,12 +142,15 @@
     </section>
     <section class="memoryBox" aria-label="検索履歴とお気に入り">
       <div class="memoryGrid">
-        <div class="memoryPanel">
-          <h2>お気に入り</h2>
+        <details class="memoryPanel memoryDetails">
+          <summary class="memorySummary">
+            <span>お気に入り</span>
+            <small id="favoritesCount">0件</small>
+          </summary>
           <div id="favoritesList" class="memoryList">
             <p>まだお気に入りがありません。</p>
           </div>
-        </div>
+        </details>
       </div>
     </section>
     <section class="quickIndexBox" aria-label="曲・アーティスト早見表">
