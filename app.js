@@ -1521,9 +1521,14 @@ function toggleFavorite(item) {
 
 function renderFavorites() {
   const root = $('#favoritesList');
+  const countEl = $('#favoritesCount');
   if (!root) return;
 
   const favorites = readFavorites();
+
+  if (countEl) {
+    countEl.textContent = `${favorites.length}件`;
+  }
 
   if (!favorites.length) {
     root.innerHTML = '<p>まだお気に入りがありません。</p>';
@@ -1531,9 +1536,8 @@ function renderFavorites() {
   }
 
   root.innerHTML = favorites.map((item) => `
-    <div class="memoryFavorite">
-      <div>
-        <span>${escapeHtml(item.typeLabel)}</span>
+    <div class="memoryFavorite memoryFavoriteCompact">
+      <div class="memoryFavoriteText">
         <strong>${escapeHtml(item.title)}</strong>
         ${item.sub ? `<small>${escapeHtml(item.sub)}</small>` : ''}
       </div>
