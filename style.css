@@ -1750,3 +1750,64 @@ body.horrorMode,
 .horrorEscape input:focus {
   box-shadow: none !important;
 }
+
+/* ツールURLコピー・お約束 */
+.links button.linkCopyButton,
+.linkCopyButton {
+  display: inline-block;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 15px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  box-shadow: 0 8px 18px rgba(112, 84, 70, 0.16);
+  font: inherit;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.links button.linkCopyButton:hover,
+.links button.linkCopyButton:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 12px 24px rgba(112, 84, 70, 0.20);
+  outline: none;
+}
+
+.promiseBox {
+  width: min(1120px, calc(100% - 28px));
+  margin: 22px auto 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 190, 202, .24), transparent 170px),
+    linear-gradient(135deg, rgba(255,255,255,.92), rgba(255, 250, 240, .92));
+  box-shadow: var(--shadow);
+}
+
+.promiseBox h2 {
+  margin: 0 0 10px;
+  color: #0b7563;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.promiseBox h2::before,
+.promiseBox h2::after {
+  content: "🍏";
+  margin: 0 8px;
+}
+
+.promiseBox ul {
+  margin: 0;
+  padding-left: 1.3em;
+  color: var(--sub);
+  font-weight: 850;
+}
+
+.promiseBox li + li {
+  margin-top: 6px;
+}
