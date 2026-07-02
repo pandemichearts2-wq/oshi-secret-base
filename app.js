@@ -1246,7 +1246,7 @@ function setupHorrorEasterEgg() {
   const heroImage = $('.hero__image');
   const escapeBox = $('#horrorEscape');
   const escapeInput = $('#horrorEscapeInput');
-  const horrorAudio = $('#horrorLoopAudio') || new Audio('./horror-loop.mp3');
+  const horrorAudio = $('#horrorLoopAudio') || new Audio('./疑惑の霧.mp3');
 
   if (!heroImage || !escapeBox || !escapeInput || !horrorAudio) return;
 
@@ -1295,7 +1295,7 @@ function setupHorrorEasterEgg() {
     escapeBox.hidden = false;
     escapeInput.value = '';
 
-    horrorAudio.src = './horror-loop.mp3';
+    horrorAudio.src = './疑惑の霧.mp3';
     horrorAudio.load();
     horrorAudio.currentTime = 0;
     tryPlayHorrorAudio();
