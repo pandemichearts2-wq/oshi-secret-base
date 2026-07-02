@@ -1579,7 +1579,9 @@ function setupOmikuji() {
   button.addEventListener('click', () => {
     const item = fortunes[Math.floor(Math.random() * fortunes.length)];
     result.innerHTML = `<strong>${escapeHtml(item.rank)}</strong><span>${escapeHtml(item.text)}</span>`;
-    startEmojiRain(['🍎', '🍏'], 22);
+    if (item.rank === '水森吉') {
+      startEmojiRain(['🍎', '🍏'], 22);
+    }
   });
 }
 
