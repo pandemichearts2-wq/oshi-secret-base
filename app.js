@@ -1230,15 +1230,33 @@ function setupHorrorEasterEgg() {
 
   let clickCount = 0;
   let timer = null;
+  let horrorLocked = false;
+
+  function isHorrorMode() {
+    return document.body.classList.contains('horrorMode');
+  }
+
+  function pushHorrorHistory() {
+    if (!horrorLocked) return;
+
+    try {
+      window.history.pushState({ horrorMode: true }, '', window.location.href);
+    } catch (error) {
+      // ブラウザ側で履歴操作が拒否されても、演出本体は続ける
+    }
+  }
 
   function enterHorrorMode() {
+    horrorLocked = true;
     document.body.classList.add('horrorMode');
     escapeBox.hidden = false;
     escapeInput.value = '';
+    pushHorrorHistory();
     setTimeout(() => escapeInput.focus(), 80);
   }
 
   function leaveHorrorMode() {
+    horrorLocked = false;
     document.body.classList.remove('horrorMode');
     escapeBox.hidden = true;
     escapeInput.value = '';
@@ -1246,7 +1264,7 @@ function setupHorrorEasterEgg() {
   }
 
   heroImage.addEventListener('click', () => {
-    if (document.body.classList.contains('horrorMode')) return;
+    if (isHorrorMode()) return;
 
     clickCount += 1;
 
@@ -1271,6 +1289,20 @@ function setupHorrorEasterEgg() {
     if (event.key === 'Enter' && escapeInput.value.trim() === 'ごめんなさい') {
       leaveHorrorMode();
     }
+  });
+
+  window.addEventListener('popstate', () => {
+    if (!isHorrorMode() || !horrorLocked) return;
+
+    pushHorrorHistory();
+    setTimeout(() => escapeInput.focus(), 80);
+  });
+
+  window.addEventListener('beforeunload', (event) => {
+    if (!isHorrorMode() || !horrorLocked) return;
+
+    event.preventDefault();
+    event.returnValue = '';
   });
 }
 
