@@ -1703,3 +1703,50 @@ body.horrorMode::after {
 .horrorEscape input:focus {
   box-shadow: none !important;
 }
+
+/* ホラー背景：画面全体を「謝れ」で本当に埋め尽くす */
+body.horrorMode,
+.horrorEscape {
+  background-color: #000 !important;
+}
+
+.horrorEscape {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='44' viewBox='0 0 96 44'%3E%0A  %3Crect width='96' height='44' fill='black'/%3E%0A  %3Ctext x='0' y='30' font-family='HGS%E5%8F%A4%E5%8D%B0%E4%BD%93, HGP%E5%8F%A4%E5%8D%B0%E4%BD%93, HG%E5%8F%A4%E5%8D%B0%E4%BD%93, serif' font-size='24' font-weight='900' fill='rgba%28190,0,24,0.62%29'%3E%E8%AC%9D%E3%82%8C%3C/text%3E%0A%3C/svg%3E") !important;
+  background-repeat: repeat !important;
+  background-size: 96px 44px !important;
+  background-position: 0 0 !important;
+}
+
+.horrorWallText {
+  display: none !important;
+}
+
+.horrorCenterBox {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.horrorMainText {
+  color: #d0001f !important;
+  font-family: "HGP古印体", "HGS古印体", "HG古印体", "HG正楷書体-PRO", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.horrorAcceptLabel {
+  color: #d0001f !important;
+  font-family: "HGP古印体", "HGS古印体", "HG古印体", "HG正楷書体-PRO", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.horrorEscape input {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.horrorEscape input:focus {
+  box-shadow: none !important;
+}
