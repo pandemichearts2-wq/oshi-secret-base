@@ -532,6 +532,7 @@ function videoCard(video) {
   const url = getVideoUrl(video);
   const date = getVideoDate(video);
   const category = getVideoCategory(video);
+  const favoriteKey = getFavoriteKey('video', title, url);
 
   return `
     <article class="card">
@@ -539,7 +540,16 @@ function videoCard(video) {
       <div class="cardBody">
         <div class="cardTitle">${escapeHtml(title)}</div>
         <div class="cardMeta">${fmtDate(date)}${category ? ` / ${escapeHtml(category)}` : ''}</div>
-        <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">配信へ飛ぶ</a>
+        <div class="cardActions">
+          <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">配信へ飛ぶ</a>
+          ${favoriteButtonHtml({
+            key: favoriteKey,
+            typeLabel: '配信',
+            title,
+            sub: category ? `${fmtDate(date)} / ${category}` : fmtDate(date),
+            url
+          })}
+        </div>
       </div>
     </article>
   `;
@@ -1041,6 +1051,8 @@ function renderSongs() {
     const timestamp = latest.timestamp || getDisplayTimestamp(getPerformanceTimestamp(performance));
     const url = videoId ? youtubeUrl(videoId, seconds) : getVideoUrl(video);
 
+    const favoriteKey = getFavoriteKey('song', songTitle, artist || videoTitle);
+
     return `
       <article class="songHit">
         <div>
@@ -1053,7 +1065,16 @@ function renderSongs() {
           ${timestamp ? ` / ${escapeHtml(timestamp)}` : ''}
           ${count > 1 ? ` / 歌唱回数 ${count}回` : ''}
         </div>
-        <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">最新の該当配信へ飛ぶ</a>
+        <div class="cardActions">
+          <a class="openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">最新の該当配信へ飛ぶ</a>
+          ${favoriteButtonHtml({
+            key: favoriteKey,
+            typeLabel: '曲',
+            title: songTitle,
+            sub: artist || videoTitle,
+            url
+          })}
+        </div>
       </article>
     `;
   }).join('') || '<p>該当する曲がありません。</p>';
@@ -1389,6 +1410,284 @@ function setupToolUrlCopy() {
   });
 }
 
+
+const SEARCH_HISTORY_KEY = 'oshiSecretBaseSearchHistoryV1';
+const FAVORITES_KEY = 'oshiSecretBaseFavoritesV1';
+
+function readJsonStorage(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function writeJsonStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+}
+
+function addSearchHistory(kind, label, value) {
+  const text = String(value || '').trim();
+  if (!text) return;
+
+  const item = {
+    kind,
+    label,
+    value: text,
+    savedAt: Date.now()
+  };
+
+  const current = readJsonStorage(SEARCH_HISTORY_KEY, []);
+  const filtered = current.filter((entry) => !(entry.kind === kind && entry.value === text));
+  filtered.unshift(item);
+
+  writeJsonStorage(SEARCH_HISTORY_KEY, filtered.slice(0, 10));
+  renderSearchHistory();
+}
+
+function renderSearchHistory() {
+  const root = $('#searchHistoryList');
+  if (!root) return;
+
+  const history = readJsonStorage(SEARCH_HISTORY_KEY, []);
+
+  if (!history.length) {
+    root.innerHTML = '<p>まだ検索履歴がありません。</p>';
+    return;
+  }
+
+  root.innerHTML = history.map((item) => `
+    <button class="memoryItem searchHistoryItem" type="button" data-kind="${escapeHtml(item.kind)}" data-value="${escapeHtml(item.value)}">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${escapeHtml(item.value)}</strong>
+    </button>
+  `).join('');
+}
+
+function applySearchHistory(kind, value) {
+  const videoSearch = $('#videoSearch');
+  const songTitleSearch = $('#songTitleSearch') || $('#songSearch');
+  const artistSearch = $('#artistSearch');
+
+  if (kind === 'video' && videoSearch) {
+    videoSearch.value = value;
+    videoSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    videoSearch.focus();
+    return;
+  }
+
+  if (kind === 'song' && songTitleSearch) {
+    songTitleSearch.value = value;
+    songTitleSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    songTitleSearch.focus();
+    return;
+  }
+
+  if (kind === 'artist' && artistSearch) {
+    artistSearch.value = value;
+    artistSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    artistSearch.focus();
+  }
+}
+
+function getFavoriteKey(type, main, sub) {
+  return `${type}__${normalize(main)}__${normalize(sub || '')}`;
+}
+
+function readFavorites() {
+  return readJsonStorage(FAVORITES_KEY, []);
+}
+
+function isFavorite(key) {
+  return readFavorites().some((item) => item.key === key);
+}
+
+function toggleFavorite(item) {
+  const favorites = readFavorites();
+  const exists = favorites.some((favorite) => favorite.key === item.key);
+
+  const next = exists
+    ? favorites.filter((favorite) => favorite.key !== item.key)
+    : [{ ...item, savedAt: Date.now() }, ...favorites].slice(0, 30);
+
+  writeJsonStorage(FAVORITES_KEY, next);
+  renderFavorites();
+  renderVideos();
+  renderSongs();
+}
+
+function renderFavorites() {
+  const root = $('#favoritesList');
+  if (!root) return;
+
+  const favorites = readFavorites();
+
+  if (!favorites.length) {
+    root.innerHTML = '<p>まだお気に入りがありません。</p>';
+    return;
+  }
+
+  root.innerHTML = favorites.map((item) => `
+    <div class="memoryFavorite">
+      <div>
+        <span>${escapeHtml(item.typeLabel)}</span>
+        <strong>${escapeHtml(item.title)}</strong>
+        ${item.sub ? `<small>${escapeHtml(item.sub)}</small>` : ''}
+      </div>
+      <div class="memoryFavoriteActions">
+        ${item.url ? `<a class="miniOpenLink" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">開く</a>` : ''}
+        <button class="miniRemoveButton favoriteRemoveButton" type="button" data-key="${escapeHtml(item.key)}">解除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function favoriteButtonHtml(item) {
+  const active = isFavorite(item.key);
+  return `
+    <button
+      class="favoriteButton${active ? ' isActive' : ''}"
+      type="button"
+      data-key="${escapeHtml(item.key)}"
+      data-type-label="${escapeHtml(item.typeLabel)}"
+      data-title="${escapeHtml(item.title)}"
+      data-sub="${escapeHtml(item.sub || '')}"
+      data-url="${escapeHtml(item.url || '')}"
+      aria-pressed="${active ? 'true' : 'false'}"
+    >${active ? 'お気に入り済み' : 'お気に入り'}</button>
+  `;
+}
+
+function setupOmikuji() {
+  const button = $('#oshiOmikujiButton');
+  const result = $('#oshiOmikujiResult');
+  if (!button || !result) return;
+
+  const fortunes = [
+    { rank: '水森吉', text: '幸せな１日になりそう🍎' },
+    { rank: '大吉', text: '今日のあなたはラッキー✨' },
+    { rank: '中吉', text: 'そこそこ良いこと起きるかもっ！' },
+    { rank: '小吉', text: '茹でたまごがしっかり半熟になりそう' },
+    { rank: '吉', text: 'たぶん部屋から1円見つかる' },
+    { rank: '末吉', text: 'ウグイスの鳴き声が聞こえるかもね' },
+    { rank: '凶', text: '世界が滅びます' }
+  ];
+
+  button.addEventListener('click', () => {
+    const item = fortunes[Math.floor(Math.random() * fortunes.length)];
+    result.innerHTML = `<strong>${escapeHtml(item.rank)}</strong><span>${escapeHtml(item.text)}</span>`;
+    startEmojiRain(['🍎', '🍏'], 22);
+  });
+}
+
+function startEmojiRain(emojis, count = 24) {
+  const layer = document.createElement('div');
+  layer.className = 'emojiRainLayer';
+  document.body.appendChild(layer);
+
+  for (let i = 0; i < count; i++) {
+    const drop = document.createElement('span');
+    drop.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    drop.style.left = `${Math.random() * 100}%`;
+    drop.style.animationDelay = `${Math.random() * 0.9}s`;
+    drop.style.animationDuration = `${2.4 + Math.random() * 1.6}s`;
+    drop.style.fontSize = `${20 + Math.random() * 18}px`;
+    layer.appendChild(drop);
+  }
+
+  setTimeout(() => layer.remove(), 5200);
+}
+
+function showOtterPop() {
+  const pop = document.createElement('div');
+  pop.className = 'otterPop';
+  pop.textContent = '🦦';
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 2600);
+}
+
+function setupKeyboardCommands() {
+  let typed = '';
+
+  window.addEventListener('keydown', (event) => {
+    const target = event.target;
+    const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+
+    if (tagName === 'input' || tagName === 'textarea' || target?.isContentEditable) return;
+    if (event.key.length !== 1) return;
+
+    typed = `${typed}${event.key.toLowerCase()}`.slice(-20);
+
+    if (typed.endsWith('ringo')) {
+      startEmojiRain(['🍎', '🍏'], 40);
+      typed = '';
+    }
+
+    if (typed.endsWith('kawauso')) {
+      showOtterPop();
+      typed = '';
+    }
+
+    if (typed.endsWith('momori')) {
+      startEmojiRain(['🍎', '🍏', '🦦'], 48);
+      typed = '';
+    }
+  });
+}
+
+function setupMemoryFeatures() {
+  renderSearchHistory();
+  renderFavorites();
+
+  const searchTargets = [
+    { selector: '#videoSearch', kind: 'video', label: '配信' },
+    { selector: '#songTitleSearch', kind: 'song', label: '曲名' },
+    { selector: '#artistSearch', kind: 'artist', label: 'アーティスト' }
+  ];
+
+  searchTargets.forEach(({ selector, kind, label }) => {
+    const input = $(selector);
+    if (!input) return;
+
+    input.addEventListener('change', () => addSearchHistory(kind, label, input.value));
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') addSearchHistory(kind, label, input.value);
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const historyButton = event.target.closest('.searchHistoryItem');
+    if (historyButton) {
+      applySearchHistory(historyButton.dataset.kind || '', historyButton.dataset.value || '');
+      return;
+    }
+
+    const favoriteButton = event.target.closest('.favoriteButton');
+    if (favoriteButton) {
+      toggleFavorite({
+        key: favoriteButton.dataset.key || '',
+        typeLabel: favoriteButton.dataset.typeLabel || '',
+        title: favoriteButton.dataset.title || '',
+        sub: favoriteButton.dataset.sub || '',
+        url: favoriteButton.dataset.url || ''
+      });
+      return;
+    }
+
+    const removeButton = event.target.closest('.favoriteRemoveButton');
+    if (removeButton) {
+      const key = removeButton.dataset.key || '';
+      writeJsonStorage(FAVORITES_KEY, readFavorites().filter((item) => item.key !== key));
+      renderFavorites();
+      renderVideos();
+      renderSongs();
+    }
+  });
+}
+
 function setupSearches() {
   const videoSearch = $('#videoSearch');
   const videoSearchClear = $('#videoSearchClear');
@@ -1491,6 +1790,9 @@ function init() {
   setupSearches();
   setupHorrorEasterEgg();
   setupToolUrlCopy();
+  setupOmikuji();
+  setupMemoryFeatures();
+  setupKeyboardCommands();
   loadData();
 }
 
