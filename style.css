@@ -2050,3 +2050,8 @@ body.horrorMode,
     justify-content: flex-start;
   }
 }
+
+/* お気に入りだけ表示するときは横幅いっぱいにする */
+.memoryGrid .memoryPanel:only-child {
+  grid-column: 1 / -1;
+}
