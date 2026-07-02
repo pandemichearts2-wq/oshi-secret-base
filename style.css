@@ -1811,3 +1811,242 @@ body.horrorMode,
 .promiseBox li + li {
   margin-top: 6px;
 }
+
+/* 推し活おみくじ・検索履歴・お気に入り・隠しコマンド */
+.omikujiBox,
+.memoryBox {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 190, 202, .28), transparent 190px),
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(234,255,244,.92));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 22px 0;
+}
+
+.omikujiBox::after {
+  content: "🍎";
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-size: 34px;
+  opacity: .16;
+}
+
+.omikujiButton {
+  display: inline-block;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+  box-shadow: 0 8px 18px rgba(112, 84, 70, 0.16);
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.omikujiButton:hover,
+.omikujiButton:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  outline: none;
+}
+
+.omikujiResult {
+  margin-top: 12px;
+  border: 1px dashed rgba(239, 111, 125, .34);
+  border-radius: 18px;
+  background: rgba(255,255,255,.84);
+  padding: 13px 14px;
+  color: var(--sub);
+  font-weight: 850;
+}
+
+.omikujiResult strong {
+  display: inline-block;
+  margin-right: 10px;
+  color: var(--apple-red);
+  font-size: 1.12rem;
+}
+
+.memoryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.memoryPanel {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.86);
+  padding: 14px;
+  box-shadow: 0 8px 20px rgba(96, 55, 35, 0.07);
+}
+
+.memoryPanel h2 {
+  margin: 0 0 10px;
+  color: #0b7563;
+  font-size: 1.08rem;
+}
+
+.memoryList {
+  display: grid;
+  gap: 8px;
+}
+
+.memoryItem,
+.memoryFavorite {
+  border: 1px solid rgba(239, 111, 125, .25);
+  border-radius: 16px;
+  background: #fff;
+  padding: 10px 12px;
+  box-shadow: 0 5px 12px rgba(112, 84, 70, 0.07);
+}
+
+.memoryItem {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.memoryItem span,
+.memoryFavorite span {
+  color: var(--sub);
+  font-size: .82rem;
+  font-weight: 850;
+}
+
+.memoryItem strong,
+.memoryFavorite strong {
+  color: #493431;
+  font-weight: 950;
+}
+
+.memoryFavorite {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.memoryFavorite small {
+  display: block;
+  color: var(--sub);
+  font-weight: 800;
+}
+
+.memoryFavoriteActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.favoriteButton,
+.miniRemoveButton,
+.miniOpenLink {
+  border: 1px solid #ead7b0;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: #fff;
+  color: #6b5200;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.favoriteButton.isActive {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--apple-red), var(--apple-green));
+}
+
+.miniRemoveButton:hover,
+.favoriteButton:hover,
+.miniOpenLink:hover {
+  transform: translateY(-1px);
+}
+
+.emojiRainLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.emojiRainLayer span {
+  position: absolute;
+  top: -48px;
+  animation-name: emojiRainFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes emojiRainFall {
+  to {
+    transform: translateY(calc(100vh + 80px)) rotate(360deg);
+    opacity: .15;
+  }
+}
+
+.otterPop {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 9996;
+  transform: translateX(-50%);
+  font-size: clamp(4rem, 18vw, 9rem);
+  animation: otterPopUp 2.4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes otterPopUp {
+  0% {
+    transform: translateX(-50%) translateY(40px) scale(.5);
+    opacity: 0;
+  }
+  25% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(20px) scale(.8);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .memoryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .memoryFavorite {
+    display: grid;
+  }
+
+  .memoryFavoriteActions {
+    justify-content: flex-start;
+  }
+}
