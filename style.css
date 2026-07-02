@@ -36,7 +36,7 @@ body {
 }
 
 body::before {
-  content: "🍎　🍏　🦦　🍎　🍏　🦦";
+  content: "";
   position: fixed;
   left: 0;
   right: 0;
@@ -88,7 +88,7 @@ main {
 }
 
 .hero::after {
-  content: "🦦";
+  content: "";
   position: absolute;
   right: 34px;
   bottom: 22px;
@@ -212,7 +212,7 @@ main {
 }
 
 .statsBox::after {
-  content: "🦦";
+  content: "";
   position: absolute;
   right: 18px;
   top: 12px;
@@ -522,7 +522,7 @@ main {
 }
 
 .featuredBox::after {
-  content: "🦦";
+  content: "";
   position: absolute;
   right: 18px;
   top: 12px;
@@ -2171,4 +2171,79 @@ body.horrorMode,
   .memoryFavoriteCompact .memoryFavoriteActions {
     justify-content: flex-start;
   }
+}
+
+
+/* iPhoneで絵文字のカワウソがラッコっぽく見える問題の修正
+   絵文字ではなく固定画像 otter.png を使う */
+body::before {
+  content: "" !important;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 10px;
+  z-index: -1;
+  height: 42px;
+  opacity: 0.16;
+  pointer-events: none;
+  background-image:
+    url("./otter.png"),
+    url("./otter.png"),
+    url("./otter.png"),
+    url("./otter.png");
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+  background-position: 28% 0, 42% 0, 58% 0, 72% 0;
+}
+
+.hero::after,
+.statsBox::after,
+.featuredBox::after {
+  content: "" !important;
+  position: absolute;
+  background-image: url("./otter.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  opacity: .20;
+  pointer-events: none;
+}
+
+.hero::after {
+  right: 34px;
+  bottom: 22px;
+  width: 54px;
+  height: 54px;
+  transform: rotate(-10deg);
+}
+
+.statsBox::after,
+.featuredBox::after {
+  right: 18px;
+  top: 12px;
+  width: 34px;
+  height: 34px;
+  transform: rotate(-10deg);
+  opacity: .18;
+}
+
+.otterPop {
+  width: clamp(4rem, 18vw, 9rem);
+  height: clamp(4rem, 18vw, 9rem);
+  display: grid;
+  place-items: center;
+}
+
+.otterPop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.emojiRainLayer span img {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  display: block;
 }
