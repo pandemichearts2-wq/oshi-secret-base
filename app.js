@@ -1231,6 +1231,9 @@ function setupHorrorEasterEgg() {
   let clickCount = 0;
   let timer = null;
   let horrorLocked = false;
+  const horrorAudio = new Audio('./horror-loop.mp3');
+  horrorAudio.loop = true;
+  horrorAudio.volume = 0.55;
 
   function isHorrorMode() {
     return document.body.classList.contains('horrorMode');
@@ -1251,6 +1254,8 @@ function setupHorrorEasterEgg() {
     document.body.classList.add('horrorMode');
     escapeBox.hidden = false;
     escapeInput.value = '';
+    horrorAudio.currentTime = 0;
+    horrorAudio.play().catch(() => {});
     pushHorrorHistory();
     setTimeout(() => escapeInput.focus(), 80);
   }
@@ -1260,6 +1265,8 @@ function setupHorrorEasterEgg() {
     document.body.classList.remove('horrorMode');
     escapeBox.hidden = true;
     escapeInput.value = '';
+    horrorAudio.pause();
+    horrorAudio.currentTime = 0;
     clickCount = 0;
   }
 
