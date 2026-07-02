@@ -1225,45 +1225,17 @@ function setupHorrorEasterEgg() {
   const heroImage = $('.hero__image');
   const escapeBox = $('#horrorEscape');
   const escapeInput = $('#horrorEscapeInput');
+  const horrorAudio = $('#horrorLoopAudio') || new Audio('./horror-loop.mp3');
 
-  if (!heroImage || !escapeBox || !escapeInput) return;
+  if (!heroImage || !escapeBox || !escapeInput || !horrorAudio) return;
 
   let clickCount = 0;
   let timer = null;
   let horrorLocked = false;
-  let horrorAudioUnlocked = false;
-  const horrorAudio = $('#horrorLoopAudio') || new Audio('./horror-loop.mp3');
+
   horrorAudio.loop = true;
   horrorAudio.preload = 'auto';
-  horrorAudio.volume = 0.7;
-
-  function unlockHorrorAudio() {
-    if (horrorAudioUnlocked) return;
-
-    horrorAudio.muted = true;
-    horrorAudio.play()
-      .then(() => {
-        horrorAudio.pause();
-        horrorAudio.currentTime = 0;
-        horrorAudio.muted = false;
-        horrorAudioUnlocked = true;
-      })
-      .catch(() => {
-        horrorAudio.muted = false;
-      });
-  }
-
-  function playHorrorAudio() {
-    horrorAudio.muted = false;
-    horrorAudio.currentTime = 0;
-    horrorAudio.play().catch(() => {
-      // ファイル名を変えずに「疑惑の霧.mp3」でアップした場合の予備ルート
-      horrorAudio.src = './疑惑の霧.mp3';
-      horrorAudio.load();
-      horrorAudio.currentTime = 0;
-      horrorAudio.play().catch(() => {});
-    });
-  }
+  horrorAudio.volume = 0.85;
 
   function isHorrorMode() {
     return document.body.classList.contains('horrorMode');
@@ -1279,12 +1251,34 @@ function setupHorrorEasterEgg() {
     }
   }
 
+  function tryPlayHorrorAudio() {
+    if (!isHorrorMode()) return;
+
+    horrorAudio.muted = false;
+    horrorAudio.loop = true;
+    horrorAudio.volume = 0.85;
+
+    horrorAudio.play().catch(() => {
+      // 自動再生が止められた場合は、次のタップ/クリックで再試行する
+    });
+  }
+
+  function stopHorrorAudio() {
+    horrorAudio.pause();
+    horrorAudio.currentTime = 0;
+  }
+
   function enterHorrorMode() {
     horrorLocked = true;
     document.body.classList.add('horrorMode');
     escapeBox.hidden = false;
     escapeInput.value = '';
-    playHorrorAudio();
+
+    horrorAudio.src = './horror-loop.mp3';
+    horrorAudio.load();
+    horrorAudio.currentTime = 0;
+    tryPlayHorrorAudio();
+
     pushHorrorHistory();
     setTimeout(() => escapeInput.focus(), 80);
   }
@@ -1294,15 +1288,13 @@ function setupHorrorEasterEgg() {
     document.body.classList.remove('horrorMode');
     escapeBox.hidden = true;
     escapeInput.value = '';
-    horrorAudio.pause();
-    horrorAudio.currentTime = 0;
+    stopHorrorAudio();
     clickCount = 0;
   }
 
   heroImage.addEventListener('click', () => {
     if (isHorrorMode()) return;
 
-    unlockHorrorAudio();
     clickCount += 1;
 
     clearTimeout(timer);
@@ -1314,6 +1306,15 @@ function setupHorrorEasterEgg() {
       clearTimeout(timer);
       enterHorrorMode();
     }
+  });
+
+  // ブラウザが音声再生を止めた時の保険。
+  // ホラー画面中にどこかをタップ/クリックしたら、その操作で音声を再試行する。
+  ['pointerdown', 'click', 'keydown', 'touchstart'].forEach((eventName) => {
+    window.addEventListener(eventName, () => {
+      if (!isHorrorMode() || !horrorLocked) return;
+      tryPlayHorrorAudio();
+    }, { passive: true });
   });
 
   escapeInput.addEventListener('input', () => {
@@ -1333,6 +1334,7 @@ function setupHorrorEasterEgg() {
 
     pushHorrorHistory();
     setTimeout(() => escapeInput.focus(), 80);
+    tryPlayHorrorAudio();
   });
 
   window.addEventListener('beforeunload', (event) => {
@@ -1340,6 +1342,50 @@ function setupHorrorEasterEgg() {
 
     event.preventDefault();
     event.returnValue = '';
+  });
+}
+
+
+function setupToolUrlCopy() {
+  const button = $('#copyToolUrlButton');
+  if (!button) return;
+
+  const url = 'https://rurua-dayo.github.io/oshi-secret-base/';
+  const defaultText = button.textContent;
+
+  function showCopied() {
+    button.textContent = 'コピーしました';
+    setTimeout(() => {
+      button.textContent = defaultText;
+    }, 1600);
+  }
+
+  function fallbackCopy() {
+    const input = document.createElement('textarea');
+    input.value = url;
+    input.setAttribute('readonly', '');
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    document.body.appendChild(input);
+    input.select();
+
+    try {
+      document.execCommand('copy');
+      showCopied();
+    } finally {
+      document.body.removeChild(input);
+    }
+  }
+
+  button.addEventListener('click', () => {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url)
+        .then(showCopied)
+        .catch(fallbackCopy);
+      return;
+    }
+
+    fallbackCopy();
   });
 }
 
@@ -1444,6 +1490,7 @@ function setupSearches() {
 function init() {
   setupSearches();
   setupHorrorEasterEgg();
+  setupToolUrlCopy();
   loadData();
 }
 
