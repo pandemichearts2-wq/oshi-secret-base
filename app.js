@@ -1231,9 +1231,39 @@ function setupHorrorEasterEgg() {
   let clickCount = 0;
   let timer = null;
   let horrorLocked = false;
-  const horrorAudio = new Audio('./horror-loop.mp3');
+  let horrorAudioUnlocked = false;
+  const horrorAudio = $('#horrorLoopAudio') || new Audio('./horror-loop.mp3');
   horrorAudio.loop = true;
-  horrorAudio.volume = 0.55;
+  horrorAudio.preload = 'auto';
+  horrorAudio.volume = 0.7;
+
+  function unlockHorrorAudio() {
+    if (horrorAudioUnlocked) return;
+
+    horrorAudio.muted = true;
+    horrorAudio.play()
+      .then(() => {
+        horrorAudio.pause();
+        horrorAudio.currentTime = 0;
+        horrorAudio.muted = false;
+        horrorAudioUnlocked = true;
+      })
+      .catch(() => {
+        horrorAudio.muted = false;
+      });
+  }
+
+  function playHorrorAudio() {
+    horrorAudio.muted = false;
+    horrorAudio.currentTime = 0;
+    horrorAudio.play().catch(() => {
+      // ファイル名を変えずに「疑惑の霧.mp3」でアップした場合の予備ルート
+      horrorAudio.src = './疑惑の霧.mp3';
+      horrorAudio.load();
+      horrorAudio.currentTime = 0;
+      horrorAudio.play().catch(() => {});
+    });
+  }
 
   function isHorrorMode() {
     return document.body.classList.contains('horrorMode');
@@ -1254,8 +1284,7 @@ function setupHorrorEasterEgg() {
     document.body.classList.add('horrorMode');
     escapeBox.hidden = false;
     escapeInput.value = '';
-    horrorAudio.currentTime = 0;
-    horrorAudio.play().catch(() => {});
+    playHorrorAudio();
     pushHorrorHistory();
     setTimeout(() => escapeInput.focus(), 80);
   }
@@ -1273,6 +1302,7 @@ function setupHorrorEasterEgg() {
   heroImage.addEventListener('click', () => {
     if (isHorrorMode()) return;
 
+    unlockHorrorAudio();
     clickCount += 1;
 
     clearTimeout(timer);
