@@ -2055,3 +2055,120 @@ body.horrorMode,
 .memoryGrid .memoryPanel:only-child {
   grid-column: 1 / -1;
 }
+
+/* お気に入り欄：検索結果が下に押されすぎないよう折りたたみ */
+.memoryDetails {
+  padding: 0;
+}
+
+.memorySummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 14px;
+  color: #0b7563;
+  font-weight: 950;
+  cursor: pointer;
+  list-style: none;
+}
+
+.memorySummary::-webkit-details-marker {
+  display: none;
+}
+
+.memorySummary::after {
+  content: "開く";
+  border: 1px solid #ead7b0;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: #6b5200;
+  background: #fff;
+  font-size: .82rem;
+  font-weight: 900;
+}
+
+.memoryDetails[open] .memorySummary::after {
+  content: "閉じる";
+}
+
+.memorySummary small {
+  margin-left: auto;
+  color: var(--sub);
+  font-size: .86rem;
+  font-weight: 900;
+}
+
+.memoryDetails .memoryList {
+  max-height: 190px;
+  overflow: auto;
+  padding: 0 12px 12px;
+}
+
+.memoryDetails .memoryFavorite {
+  padding: 8px 10px;
+}
+
+.memoryDetails .memoryFavorite strong {
+  font-size: .94rem;
+}
+
+/* お気に入り一覧：開いた状態もさらにコンパクト */
+.memoryDetails .memoryList {
+  max-height: 135px;
+  gap: 5px;
+  padding: 0 10px 10px;
+}
+
+.memoryFavoriteCompact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 12px;
+}
+
+.memoryFavoriteText {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.memoryFavoriteCompact strong,
+.memoryFavoriteCompact small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memoryFavoriteCompact strong {
+  font-size: .9rem;
+  line-height: 1.25;
+}
+
+.memoryFavoriteCompact small {
+  font-size: .78rem;
+  line-height: 1.2;
+}
+
+.memoryFavoriteCompact .memoryFavoriteActions {
+  gap: 4px;
+}
+
+.memoryFavoriteCompact .miniOpenLink,
+.memoryFavoriteCompact .miniRemoveButton {
+  padding: 4px 8px;
+  font-size: .78rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .memoryFavoriteCompact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .memoryFavoriteCompact .memoryFavoriteActions {
+    justify-content: flex-start;
+  }
+}
