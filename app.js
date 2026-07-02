@@ -1596,7 +1596,17 @@ function startEmojiRain(emojis, count = 24) {
 
   for (let i = 0; i < count; i++) {
     const drop = document.createElement('span');
-    drop.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const item = emojis[Math.floor(Math.random() * emojis.length)];
+
+    if (item === 'otter') {
+      const img = document.createElement('img');
+      img.src = './otter.png';
+      img.alt = 'カワウソ';
+      drop.appendChild(img);
+    } else {
+      drop.textContent = item;
+    }
+
     drop.style.left = `${Math.random() * 100}%`;
     drop.style.animationDelay = `${Math.random() * 0.9}s`;
     drop.style.animationDuration = `${2.4 + Math.random() * 1.6}s`;
@@ -1610,7 +1620,10 @@ function startEmojiRain(emojis, count = 24) {
 function showOtterPop() {
   const pop = document.createElement('div');
   pop.className = 'otterPop';
-  pop.textContent = '🦦';
+  const img = document.createElement('img');
+  img.src = './otter.png';
+  img.alt = 'カワウソ';
+  pop.appendChild(img);
   document.body.appendChild(pop);
   setTimeout(() => pop.remove(), 2600);
 }
@@ -1638,7 +1651,7 @@ function setupKeyboardCommands() {
     }
 
     if (typed.endsWith('momori')) {
-      startEmojiRain(['🍎', '🍏', '🦦'], 48);
+      startEmojiRain(['🍎', '🍏', 'otter'], 48);
       typed = '';
     }
   });
