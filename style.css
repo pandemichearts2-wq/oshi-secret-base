@@ -1636,3 +1636,70 @@ body.horrorMode::before,
 body.horrorMode::after {
   content: none !important;
 }
+
+/* ホラー画面の見た目調整：横整列・枠なし・発光なし */
+.horrorWallText {
+  inset: 0 !important;
+  padding: 8px 0 !important;
+  color: rgba(190, 0, 24, .46) !important;
+  font-family: "HGS古印体", "HG古印体", "HG正楷書体-PRO", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+  font-size: clamp(18px, 2.45vw, 36px) !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  letter-spacing: .22em !important;
+  text-align: left !important;
+  word-break: break-all !important;
+  white-space: normal !important;
+  transform: none !important;
+  text-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.horrorWallText,
+.horrorWallText::before,
+.horrorWallText::after {
+  content:
+    "謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ 謝れ";
+  display: block !important;
+  margin: 0 !important;
+}
+
+.horrorWallText::before {
+  margin-top: 0 !important;
+}
+
+.horrorWallText::after {
+  margin-top: 0 !important;
+}
+
+.horrorCenterBox {
+  width: min(520px, calc(100% - 40px)) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.horrorMainText {
+  color: #d0001f !important;
+  font-family: "HGS古印体", "HG古印体", "HG正楷書体-PRO", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+  font-size: clamp(5.2rem, 18vw, 10rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: .12em !important;
+  text-shadow: none !important;
+}
+
+.horrorAcceptLabel {
+  color: #d0001f !important;
+  font-family: "HGS古印体", "HG古印体", "HG正楷書体-PRO", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+  text-shadow: none !important;
+}
+
+.horrorEscape input {
+  box-shadow: none !important;
+}
+
+.horrorEscape input:focus {
+  box-shadow: none !important;
+}
