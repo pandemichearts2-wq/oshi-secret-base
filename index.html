@@ -36,6 +36,37 @@
     .monthGroup h3 { border-left: 6px solid #0b6b63; padding-left: 10px; margin-bottom: 12px; }
     .footer { text-align: center; padding: 24px; color: #555; }
     @media (max-width: 800px) { .hero, .searchGrid, .resultGrid { grid-template-columns: 1fr; } .card { grid-template-columns: 1fr; } .card img { width: 100%; height: auto; max-height: 220px; } }
+
+
+    /* ヘッダーリンク：通常4ボタンは元の大きさ、住人票だけ大きくする */
+    .links > a:not(.residentCardButton),
+    .links > button.linkCopyButton {
+      min-width: auto !important;
+      min-height: auto !important;
+      width: auto !important;
+      padding: 9px 15px !important;
+      font-size: 1rem !important;
+      line-height: 1.7 !important;
+      display: inline-block !important;
+    }
+
+    .links > a.residentCardButton {
+      min-width: 260px !important;
+      min-height: 72px !important;
+      padding: 18px 30px !important;
+      font-size: 1.45rem !important;
+      line-height: 1.2 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    @media (max-width: 640px) {
+      .links > a.residentCardButton {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+    }
   </style>
 </head>
 <body>
