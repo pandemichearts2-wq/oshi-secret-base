@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🍏物置の秘密基地🍎</title>
   <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
-  <link rel="stylesheet" href="./style.css?v=25" />
+  <link rel="stylesheet" href="./style.css?v=26" />
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; background: #fffaf7; line-height: 1.7; }
@@ -39,15 +39,18 @@
 
 
     /* ヘッダーリンク：通常4ボタンは元の大きさ、住人票だけ大きくする */
-    .links > a:not(.residentCardButton),
-    .links > button.linkCopyButton {
-      min-width: auto !important;
-      min-height: auto !important;
+    .links > .headerStandardButton {
+      min-width: 0 !important;
+      min-height: 0 !important;
       width: auto !important;
+      height: auto !important;
       padding: 9px 15px !important;
       font-size: 1rem !important;
-      line-height: 1.7 !important;
-      display: inline-block !important;
+      line-height: 1.2 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 0 auto !important;
     }
 
     .links > a.residentCardButton {
@@ -80,10 +83,10 @@
 <p class="lead" style="margin-left: 1px;">-水森りんごの軌跡を辿る時間旅行へようこそ-</p>
 <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
       <nav class="links" aria-label="公式リンク">
-        <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
-        <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
-        <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
-        <button id="copyToolUrlButton" class="linkCopyButton" type="button">このツールを広める(URLコピー)</button>
+        <a class="headerStandardButton" href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a class="headerStandardButton" href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
+        <a class="headerStandardButton" href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
+        <button id="copyToolUrlButton" class="linkCopyButton headerStandardButton" type="button">このツールを広める(URLコピー)</button>
         <a
           class="residentCardButton"
           href="https://script.google.com/macros/s/AKfycbyWZn91AqKcfLyQacwryoGSWylu9HhmfTiqzxYGU6bj6l63uWPYi016DgxHnfpInJZhmA/exec"
