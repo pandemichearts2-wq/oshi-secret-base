@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🍏物置の秘密基地🍎</title>
   <meta name="description" content="配信の軌跡と歌枠セットリスト検索ができる非公式ファンメイドアーカイブです。" />
-  <link rel="stylesheet" href="./style.css?v=26" />
+  <link rel="stylesheet" href="./style.css?v=27" />
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #222; background: #fffaf7; line-height: 1.7; }
@@ -36,40 +36,6 @@
     .monthGroup h3 { border-left: 6px solid #0b6b63; padding-left: 10px; margin-bottom: 12px; }
     .footer { text-align: center; padding: 24px; color: #555; }
     @media (max-width: 800px) { .hero, .searchGrid, .resultGrid { grid-template-columns: 1fr; } .card { grid-template-columns: 1fr; } .card img { width: 100%; height: auto; max-height: 220px; } }
-
-
-    /* ヘッダーリンク：通常4ボタンは元の大きさ、住人票だけ大きくする */
-    .links > .headerStandardButton {
-      min-width: 0 !important;
-      min-height: 0 !important;
-      width: auto !important;
-      height: auto !important;
-      padding: 9px 15px !important;
-      font-size: 1rem !important;
-      line-height: 1.2 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      flex: 0 0 auto !important;
-    }
-
-    .links > a.residentCardButton {
-      min-width: 260px !important;
-      min-height: 72px !important;
-      padding: 18px 30px !important;
-      font-size: 1.45rem !important;
-      line-height: 1.2 !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-
-    @media (max-width: 640px) {
-      .links > a.residentCardButton {
-        width: 100% !important;
-        min-width: 0 !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -83,17 +49,11 @@
 <p class="lead" style="margin-left: 1px;">-水森りんごの軌跡を辿る時間旅行へようこそ-</p>
 <p class="lead">配信の軌跡、タイトル検索、歌枠の曲検索をまとめて探せる場所。</p>
       <nav class="links" aria-label="公式リンク">
-        <a class="headerStandardButton" href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
-        <a class="headerStandardButton" href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
-        <a class="headerStandardButton" href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
-        <button id="copyToolUrlButton" class="linkCopyButton headerStandardButton" type="button">このツールを広める(URLコピー)</button>
-        <a
-          class="residentCardButton"
-          href="https://script.google.com/macros/s/AKfycbyWZn91AqKcfLyQacwryoGSWylu9HhmfTiqzxYGU6bj6l63uWPYi016DgxHnfpInJZhmA/exec"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="min-width:260px; min-height:72px; padding:18px 30px; font-size:1.45rem; display:inline-flex; align-items:center; justify-content:center;"
-        >住人票を作る</a>
+        <a href="https://www.youtube.com/@mimori_ch" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://x.com/mimori_ch?s=20" target="_blank" rel="noopener noreferrer">X</a>
+        <a href="https://marshmallow-qa.com/neea1887n22ec1l?t=weSsQa&utm_medium=url_text&utm_source=promotion" target="_blank" rel="noopener noreferrer">マシュマロ</a>
+        <button id="copyToolUrlButton" class="linkCopyButton" type="button">このツールを広める(URLコピー)</button>
+        <a href="https://script.google.com/macros/s/AKfycbyWZn91AqKcfLyQacwryoGSWylu9HhmfTiqzxYGU6bj6l63uWPYi016DgxHnfpInJZhmA/exec" target="_blank" rel="noopener noreferrer" style="min-width:260px;min-height:72px;padding:18px 30px;font-size:1.45rem;display:inline-flex;align-items:center;justify-content:center;">住人票を作る</a>
       </nav>
     </div>
   </header>
