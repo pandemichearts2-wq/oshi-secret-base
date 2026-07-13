@@ -2290,3 +2290,40 @@ body::before {
     font-size: 1rem;
   }
 }
+/* 住人票を作るボタン：特大表示（style.cssの一番下に追加） */
+.links .residentCardButton {
+  flex: 0 0 auto !important;
+  min-width: 250px !important;
+  min-height: 78px !important;
+  padding: 20px 42px !important;
+  border: 4px solid rgba(255, 255, 255, .92) !important;
+  border-radius: 999px !important;
+  font-size: 1.55rem !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+  letter-spacing: .06em !important;
+  color: #fff !important;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.34), transparent 28%),
+    linear-gradient(135deg, #ff758d 0%, #ef5f76 48%, #54b77e 100%) !important;
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,.26),
+    0 16px 34px rgba(112, 84, 70, .34) !important;
+  transform: translateY(-1px);
+}
+
+.links .residentCardButton:hover,
+.links .residentCardButton:focus-visible {
+  transform: translateY(-4px) scale(1.04) !important;
+}
+
+@media (max-width: 640px) {
+  .links .residentCardButton {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 70px !important;
+    padding: 18px 24px !important;
+    font-size: 1.35rem !important;
+  }
+}
